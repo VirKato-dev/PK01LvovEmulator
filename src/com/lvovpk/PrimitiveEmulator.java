@@ -13,8 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 /**
-	Primitive Lvov Emulator
-*/ 
+ * Primitive Lvov Emulator
+ */
 public class PrimitiveEmulator extends JFrame implements Runnable {
 
 	/**
@@ -76,7 +76,6 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 				printerDevice.write(buffer);
 			} catch (Exception ex) {
 			}
-		;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -193,7 +192,8 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 				break;
 			} catch (InterruptedException ex) {
 			}
-		// try {framer.join();} catch (InterruptedException ex) {} // only one attempt
+		// try {framer.join();} catch (InterruptedException ex) {} // only one
+		// attempt
 	}
 
 	// -----------------------------------------------------------------------------

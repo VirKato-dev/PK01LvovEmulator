@@ -10,15 +10,14 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 
 /**
-	Extended Lvov Emulator
-*/
+ * Extended Lvov Emulator
+ */
 public class ExtendedEmulator extends PrimitiveEmulator {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4020586722385270698L;
-	// -----------------------------------------------------------------------------
 	String ireq2, Overlay;
 	int ireq3;
 
@@ -231,7 +230,8 @@ public class ExtendedEmulator extends PrimitiveEmulator {
 		try {
 			InputStreamReader src = new InputStreamReader(Utils.ZIP(name, new FileInputStream(name)));
 			StringBuffer sb = new StringBuffer();
-			for (int ch; (ch = src.read()) >= 0; sb.append((char) ch));
+			for (int ch; (ch = src.read()) >= 0; sb.append((char) ch))
+				;
 			src.close();
 			return paste(sb.toString());
 		} catch (Exception ex) {

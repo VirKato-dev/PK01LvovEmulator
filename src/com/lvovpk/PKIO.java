@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
-	Various .LVT Manipulations
-*/
+ * Various .LVT Manipulations
+ */
 class PKIO {
 
 	final static int cp_866_u = 0;
@@ -122,21 +122,29 @@ class PKIO {
 	// -----------------------------------------------------------------------------
 	private static String toks[] = {
 		// 0x80
-		"END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ", "LET", "GOTO", "RUN", "IF", "RESTORE", "GOSUB", "RETURN", "REM", "STOP",
+		"END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ", "LET",
+		"GOTO", "RUN", "IF", "RESTORE", "GOSUB", "RETURN", "REM", "STOP",
 		// 0x90
-		"CLS", "ON", "PLOT", "DRAW", "POKE", "PRINT", "DEF", "CONT", "LIST", "CLEAR", "CLOAD", "CSAVE", "NEW", "LOAD", "MERGE", "SAVE",
+		"CLS", "ON", "PLOT", "DRAW", "POKE", "PRINT", "DEF", "CONT", 
+		"LIST", "CLEAR", "CLOAD", "CSAVE", "NEW", "LOAD", "MERGE", "SAVE",
 		// 0xA0
-		"OUT", "WAIT", "SLOAD", "BSAVE", "BLOAD", "BAUD", "LOCATE", "COLOR", "LINE", "PSET", "PRESET", "CIRCLE", "PAINT", "GET", "PUT", "BEEP",
+		"OUT", "WAIT", "SLOAD", "BSAVE", "BLOAD", "BAUD", "LOCATE", "COLOR",
+		"LINE", "PSET", "PRESET", "CIRCLE", "PAINT", "GET", "PUT", "BEEP",
 		// 0xB0
-		"SOUND", "DELETE", "RENUM", "EDIT", "VPOKE", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "TAB(", "TO", "SPC(", "FN",
+		"SOUND", "DELETE", "RENUM", "EDIT", "VPOKE", "@@", "@@",
+		"@@", "@@", "@@", "@@", "@@", "TAB(", "TO", "SPC(", "FN",
 		// 0xC0
-		"THEN", "NOT", "STEP", "+", "-", "*", "/", "^", "AND", "OR", ">", "=", "<", "@@", "@@", "@@",
+		"THEN", "NOT", "STEP", "+", "-", "*", "/", "^",
+		"AND", "OR", ">", "=", "<", "@@", "@@", "@@",
 		// 0xD0
-		"SGN", "INT", "ABS", "USR", "FRE", "INP", "POS", "SQR", "RND", "LOG", "EXP", "COS", "SIN", "TAN", "ATN", "PEEK",
+		"SGN", "INT", "ABS", "USR", "FRE", "INP", "POS", "SQR",
+		"RND", "LOG", "EXP", "COS", "SIN", "TAN", "ATN", "PEEK",
 		// 0xE0
-		"LEN", "STR$", "VAL", "ASC", "CHR$", "LEFT$", "RIGHT$", "MID$", "INKEY$", "HEX$", "POINT", "VARPTR", "CSRLIN", "VPEEK", "@@", "@@",
+		"LEN", "STR$", "VAL", "ASC", "CHR$", "LEFT$", "RIGHT$", "MID$",
+		"INKEY$", "HEX$", "POINT", "VARPTR", "CSRLIN", "VPEEK", "@@", "@@",
 		// 0xF0
-		"@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@"
+		"@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@",
+		"@@", "@@", "@@", "@@", "@@", "@@", "@@", "@@"
 	};
 
 	// -----------------------------------------------------------------------------

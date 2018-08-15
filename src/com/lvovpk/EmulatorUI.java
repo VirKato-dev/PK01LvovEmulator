@@ -10,7 +10,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.ImageProducer;
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Dictionary;
@@ -26,10 +28,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.MenuElement;
 
 /**
-	User Interface for Lvov Emulator
-*/
+ * User Interface for Lvov Emulator
+ */
 public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, KeyListener, WindowListener {
-	
+
 	/**
 	 * 
 	 */
@@ -43,13 +45,14 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	static final int cmInvokeAbout = 24;
 	static final int cmInvokeLog = 25;
 	static final int cmVolCtl = 1000;
-	
-	JPopupMenu pm = null;
-	EditorWindow tx;
-	DebuggerWindow dbg;
-	LogWindow log;
-	JLabel st;
 
+	private JPopupMenu pm = null;
+	private EditorWindow tx;
+	private DebuggerWindow dbg;
+	private LogWindow log;
+	private JLabel st;
+	
+	private String configFileName = null;
 
 	public final void do_config_dump(String Name) {
 		config_dump(Name);
@@ -74,11 +77,30 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			o.println("#LVOV Settings");
 			k = Utils.sort(Defaults.cfg.keys(), true);
 			for (int i = 0; i < k.length; i++)
-				o.println(Utils.padRight(k[i], 20) + Defaults.cfg.get(k[i]).toString());
+				o.println(Utils.padRight(k[i], 40) + Defaults.cfg.get(k[i]).toString());
 			o.println("");
 
 			o.close();
 		} catch (IOException ex) {
+		}
+	}
+
+	void config_load(String tf) {
+		writeLog("Loading configurations from file...");
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(tf));
+			Defaults.cfg = new Hashtable<String, String>();
+			String line = reader.readLine();
+			while (line != null) {
+				if (line != null && line.length() > 3 && !line.trim().startsWith("#")) {
+					String[] values = line.split("#")[0].split(" ");
+					Defaults.cfg.put(values[0], values[values.length - 1]);
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException ex) {
+			writeLog("Unable to load configurations from file: " + ex.getMessage());
 		}
 	}
 
@@ -261,7 +283,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		mkMenuItem(submn, Name, "About", cmInvokeAbout, "About");
 		mkMenuItem(submn, Name, "Log", cmInvokeLog, "Events log");
 		mkMenuItem(submn, Name, "Cfg", cmConfig, "Save default configuration");
-		mkMenuItem(submn, Name, "Quit", cmStop, "Quit from emuler");
+		mkMenuItem(submn, Name, "Quit", cmStop, "Quit");
 		mkMenuMenu(mn, submn, flatten);
 	}
 
@@ -496,7 +518,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmConfig:
-			fn = Utils.mkFile(this, "Choose configuration file", "emul.cfg");
+			fn = Utils.mkFile(this, "Choose configuration file", "emulator.cfg");
 			if (fn != null)
 				do_config_dump(fn);
 			break;
@@ -516,13 +538,17 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		}
 	}
-	
+
+	public void setConfigFileName(String configFileName) {
+		this.configFileName = configFileName;
+	}
+
 	private void showAboutDialog() {
-		JOptionPane.showMessageDialog(this, "PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.1\n"
-				+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n"
-				+ "(c) 2018 by Izhak Serovsky \n\n"
-				+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
-				+ "The emulator is distributed under the GNU General Public License version 2");
+		JOptionPane.showMessageDialog(this,
+				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.1\n"
+						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n" + "(c) 2018 by Izhak Serovsky \n\n"
+						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
+						+ "The emulator is distributed under the GNU General Public License version 2");
 	}
 
 	// -----------------------------------------------------------------------------
@@ -531,13 +557,16 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	@Override
 	public void init() {
 		log = new LogWindow(this, "Events log", false);
-		
+
 		try {
-			setIconImage(
-					createImage((ImageProducer) getClass().getResource("pk01lvov.gif").getContent()));
+			setIconImage(createImage((ImageProducer) getClass().getResource("pk01lvov.gif").getContent()));
 		} catch (IOException e) {
 		}
 		
+		if (configFileName != null) {
+			config_load(configFileName);
+		}
+
 		writeLog("Booting Computer...");
 		try {
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -548,7 +577,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			}
 			configure();
 			setSize(fly.preferredLayoutSize(this));
-			setTitle("PK-01 Lvov Emulator v1.1");
+			setTitle("PK-01 Lvov Emulator");
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		} catch (Exception ex) {
 			init_failed = ex.toString();
@@ -571,7 +600,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	void showStatus(String status) {
 		st.setText(status);
 	}
-	
+
 	@Override
 	void writeLog(String msg) {
 		log.appendToLog(msg);

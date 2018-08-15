@@ -1,8 +1,8 @@
 package com.lvovpk;
 
 /**
-	LVOV Hardware Abstraction
-*/
+ * LVOV Hardware Abstraction
+ */
 class Lvov extends I8080 {
 	byte[] printer;
 	int printed;

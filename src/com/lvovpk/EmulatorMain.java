@@ -8,8 +8,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 /**
-	Entry Point to Lvov Emulator
-*/
+ * Entry Point to Lvov Emulator
+ */
 public class EmulatorMain extends EmulatorUI {
 	/**
 	 * 
@@ -21,8 +21,10 @@ public class EmulatorMain extends EmulatorUI {
 	@Override
 	public void init() {
 		super.init();
-		if (init_failed == null && args != null && args.length >= 1)
+		if (init_failed == null && args != null && args.length >= 1 && !args[0].equals("-l"))
 			restore(args[0]);
+		else if (init_failed == null && args != null && args.length >= 3 && args[0].equals("-l"))
+			restore(args[2]);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -46,15 +48,19 @@ public class EmulatorMain extends EmulatorUI {
 	}
 
 	// -----------------------------------------------------------------------------
-	// S t a n d a l o n e I n i t i a l i z a t i o n
+	// I n i t i a l i z a t i o n
 	// -----------------------------------------------------------------------------
 	public static void main(String[] args) throws Exception {
 		try {
 			EmulatorMain em = new EmulatorMain();
-			if (args.length <= 0 || !args[0].startsWith("-")) {
-				// ok, bootup (maybe with one dumpfile)
-				
+			if (args.length <= 0 || args[0].equals("-l") || !args[0].startsWith("-")) {
+
+				if (args.length > 0 && args[0].equals("-l"))
+					em.setConfigFileName(args[1]);
+
 				em.args = args;
+
+				// ok, bootup (maybe with one dumpfile)
 				em.init();
 				em.setVisible(true);
 				em.start();
@@ -88,7 +94,8 @@ public class EmulatorMain extends EmulatorUI {
 
 			// -----------------------------------------------------------------------------
 			else {
-				System.out.println("USAGE: emul.class -d <conf_file> to dump defaults\n"
+				System.out.println("USAGE: PK01LvovEmulator.jar -d <conf_file> to dump default configurations\n"
+						+ "                  -l <conf_file> to replace default configurations\n"
 						+ "                  -p <basic_file> to produce basic .lvt from textual stdin\n"
 						+ "                     -p866 -p1251 -pkoi8 allows you to specify codepage,\n"
 						+ "                     -p just uses default and it isn't good on wintel\n"

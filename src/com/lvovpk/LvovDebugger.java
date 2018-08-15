@@ -1,8 +1,8 @@
 package com.lvovpk;
 
 /**
-	Lvov vs. Debugger interface
-*/
+ * Lvov vs. Debugger interface
+ */
 class LvovDebugger extends Debugger {
 	PK01 lv;
 

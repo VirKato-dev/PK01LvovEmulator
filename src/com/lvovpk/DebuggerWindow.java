@@ -19,17 +19,17 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
-	Simple Debugger
-*/
+ * Simple Debugger
+ */
 class DebuggerWindow extends JDialog implements ActionListener, WindowListener, KeyListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7645934054444666050L;
-	Debugger peer;
-	JTextArea tty;
-	JButton ok;
-	JTextField cmdLine;
+	private Debugger peer;
+	private JTextArea tty;
+	private JButton ok;
+	private JTextField cmdLine;
 
 	// -----------------------------------------------------------------------------
 	DebuggerWindow(JFrame wnd, String title, boolean modal, Debugger peer) {
@@ -59,7 +59,7 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 		tty = new JTextArea("");
 		tty.setEditable(false);
 		tty.setFont(new Font("Monospaced", Font.BOLD, 14));
-		
+
 		JScrollPane sp = new JScrollPane(tty);
 		sp.setBounds(0, 0, 450, 600);
 		add(sp, BorderLayout.CENTER);
@@ -147,53 +147,56 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 	// -----------------------------------------------------------------------------
 	boolean f_Reg = true, f_Mem = true, f_Port = true, f_Code = true;
 
-	int ptr_Mem = 0, sz_Mem = 4, new_Mem = ptr_Mem, ptr_Port = 0, sz_Port = 2,
-		new_Port = ptr_Port, ptr_Code = 0, sz_Code = 16, new_Code = ptr_Code;
+	int ptr_Mem = 0, sz_Mem = 4, new_Mem = ptr_Mem, ptr_Port = 0, sz_Port = 2, new_Port = ptr_Port, ptr_Code = 0,
+			sz_Code = 16, new_Code = ptr_Code;
 
 	// -----------------------------------------------------------------------------
 	static String flags[][] = new String[][] {
-		{ "P", "M" }, { "NZ", "Z" }, { "0", "1" }, { "ac", "AC" },
-		{ "0", "1" }, { "PO", "PE" }, { "0", "1" }, { "NC", "C" }
-	};
+			{ "P", "M" }, { "NZ", "Z" },  { "0", "1" }, { "ac", "AC" },
+			{ "0", "1" }, { "PO", "PE" }, { "0", "1" }, { "NC", "C" }
+		};
 
 	// -----------------------------------------------------------------------------
 	static String opcodes[] = new String[] {
-		"NOP", "LXI\tB,#", "STAX\tB", "INX\tB", "INR\tB", "DCR\tB", "MVI\tB,*", "RLC", "!NOP", "DAD\tB", "LDAX\tB",
-		"DCX\tB", "INR\tC", "DCR\tC", "MVI\tC,*", "RRC",
+			"NOP", "LXI\tB,#", "STAX\tB", "INX\tB", "INR\tB", "DCR\tB", "MVI\tB,*",	"RLC",
+			"!NOP", "DAD\tB",  "LDAX\tB", "DCX\tB", "INR\tC", "DCR\tC", "MVI\tC,*", "RRC",
 
-		"!NOP", "LXI\tD,#", "STAX\tD", "INX\tD", "INR\tD", "DCR\tD", "MVI\tD,*", "RAL", "!NOP", "DAD\tD", "LDAX\tD",
-		"DCX\tD", "INR\tE", "DCR\tE", "MVI\tE,*", "RAR",
+			"!NOP", "LXI\tD,#", "STAX\tD", "INX\tD", "INR\tD", "DCR\tD", "MVI\tD,*", "RAL",
+			"!NOP", "DAD\tD",   "LDAX\tD", "DCX\tD", "INR\tE", "DCR\tE", "MVI\tE,*", "RAR",
 
-		"!NOP", "LXI\tH,#", "SHLD\t#", "INX\tH", "INR\tH", "DCR\tH", "MVI\tH,*", "DAA", "!NOP", "DAD\tH", "LHLD\t#",
-		"DCX\tH", "INR\tL", "DCR\tL", "MVI\tL,*", "CMA",
+			"!NOP", "LXI\tH,#", "SHLD\t#", "INX\tH", "INR\tH", "DCR\tH", "MVI\tH,*", "DAA",
+			"!NOP", "DAD\tH",  "LHLD\t#",  "DCX\tH", "INR\tL", "DCR\tL", "MVI\tL,*", "CMA",
 
-		"!NOP", "LXI\tSP,#", "STA\t#", "INX\tSP", "INR\tM", "DCR\tM", "MVI\tM,*", "STC", "!NOP", "DAD\tSP",
-		"LDA\t#", "DCX\tSP", "INR\tA", "DCR\tA", "MVI\tA,*", "CMC",
+			"!NOP", "LXI\tSP,#", "STA\t#", "INX\tSP", "INR\tM", "DCR\tM", "MVI\tM,*", "STC",
+			"!NOP", "DAD\tSP",   "LDA\t#", "DCX\tSP", "INR\tA", "DCR\tA", "MVI\tA,*", "CMC",
 
-		"MOV\tB,B", "MOV\tB,C", "MOV\tB,D", "MOV\tB,E", "MOV\tB,H", "MOV\tB,L", "MOV\tB,M", "MOV\tB,A", "MOV\tC,B",
-		"MOV\tC,C", "MOV\tC,D", "MOV\tC,E", "MOV\tC,H", "MOV\tC,L", "MOV\tC,M", "MOV\tC,A", "MOV\tD,B", "MOV\tD,C",
-		"MOV\tD,D", "MOV\tD,E", "MOV\tD,H", "MOV\tD,L", "MOV\tD,M", "MOV\tD,A", "MOV\tE,B", "MOV\tE,C", "MOV\tE,D",
-		"MOV\tE,E", "MOV\tE,H", "MOV\tE,L", "MOV\tE,M", "MOV\tE,A", "MOV\tH,B", "MOV\tH,C", "MOV\tH,D", "MOV\tH,E",
-		"MOV\tH,H", "MOV\tH,L", "MOV\tH,M", "MOV\tH,A", "MOV\tL,B", "MOV\tL,C", "MOV\tL,D", "MOV\tL,E", "MOV\tL,H",
-		"MOV\tL,L", "MOV\tL,M", "MOV\tL,A", "MOV\tM,B", "MOV\tM,C", "MOV\tM,D", "MOV\tM,E", "MOV\tM,H", "MOV\tM,L",
-		"HLT", "MOV\tM,A", "MOV\tA,B", "MOV\tA,C", "MOV\tA,D", "MOV\tA,E", "MOV\tA,H", "MOV\tA,L", "MOV\tA,M",
-		"MOV\tA,A",
+			"MOV\tB,B", "MOV\tB,C", "MOV\tB,D", "MOV\tB,E", "MOV\tB,H", "MOV\tB,L", "MOV\tB,M", "MOV\tB,A",
+			"MOV\tC,B",	"MOV\tC,C", "MOV\tC,D", "MOV\tC,E", "MOV\tC,H", "MOV\tC,L", "MOV\tC,M", "MOV\tC,A",
+			"MOV\tD,B", "MOV\tD,C",	"MOV\tD,D", "MOV\tD,E", "MOV\tD,H", "MOV\tD,L", "MOV\tD,M", "MOV\tD,A",
+			"MOV\tE,B", "MOV\tE,C", "MOV\tE,D",	"MOV\tE,E", "MOV\tE,H", "MOV\tE,L", "MOV\tE,M", "MOV\tE,A",
+			"MOV\tH,B", "MOV\tH,C", "MOV\tH,D", "MOV\tH,E",	"MOV\tH,H", "MOV\tH,L", "MOV\tH,M", "MOV\tH,A",
+			"MOV\tL,B", "MOV\tL,C", "MOV\tL,D", "MOV\tL,E", "MOV\tL,H",	"MOV\tL,L", "MOV\tL,M", "MOV\tL,A",
+			"MOV\tM,B", "MOV\tM,C", "MOV\tM,D", "MOV\tM,E", "MOV\tM,H", "MOV\tM,L",	"HLT",      "MOV\tM,A",
+			"MOV\tA,B", "MOV\tA,C", "MOV\tA,D", "MOV\tA,E", "MOV\tA,H", "MOV\tA,L", "MOV\tA,M",	"MOV\tA,A",
 
-		"ADD\tB", "ADD\tC", "ADD\tD", "ADD\tE", "ADD\tH", "ADD\tL", "ADD\tM", "ADD\tA", "ADC\tB", "ADC\tC",
-		"ADC\tD", "ADC\tE", "ADC\tH", "ADC\tL", "ADC\tM", "ADC\tA", "SUB\tB", "SUB\tC", "SUB\tD", "SUB\tE",
-		"SUB\tH", "SUB\tL", "SUB\tM", "SUB\tA", "SBB\tB", "SBB\tC", "SBB\tD", "SBB\tE", "SBB\tH", "SBB\tL",
-		"SBB\tM", "SBB\tA", "ANA\tB", "ANA\tC", "ANA\tD", "ANA\tE", "ANA\tH", "ANA\tL", "ANA\tM", "ANA\tA",
-		"XRA\tB", "XRA\tC", "XRA\tD", "XRA\tE", "XRA\tH", "XRA\tL", "XRA\tM", "XRA\tA", "ORA\tB", "ORA\tC",
-		"ORA\tD", "ORA\tE", "ORA\tH", "ORA\tL", "ORA\tM", "ORA\tA", "CMP\tB", "CMP\tC", "CMP\tD", "CMP\tE",
-		"CMP\tH", "CMP\tL", "CMP\tM", "CMP\tA",
+			"ADD\tB", "ADD\tC", "ADD\tD", "ADD\tE", "ADD\tH", "ADD\tL", "ADD\tM", "ADD\tA",
+			"ADC\tB", "ADC\tC", "ADC\tD", "ADC\tE", "ADC\tH", "ADC\tL", "ADC\tM", "ADC\tA",
+			"SUB\tB", "SUB\tC",	"SUB\tD", "SUB\tE",	"SUB\tH", "SUB\tL", "SUB\tM", "SUB\tA",
+			"SBB\tB", "SBB\tC", "SBB\tD", "SBB\tE", "SBB\tH", "SBB\tL", "SBB\tM", "SBB\tA",
+			"ANA\tB", "ANA\tC", "ANA\tD", "ANA\tE",	"ANA\tH", "ANA\tL", "ANA\tM", "ANA\tA",
+			"XRA\tB", "XRA\tC", "XRA\tD", "XRA\tE", "XRA\tH", "XRA\tL", "XRA\tM", "XRA\tA",
+			"ORA\tB", "ORA\tC", "ORA\tD", "ORA\tE", "ORA\tH", "ORA\tL",	"ORA\tM", "ORA\tA",
+			"CMP\tB", "CMP\tC", "CMP\tD", "CMP\tE",	"CMP\tH", "CMP\tL", "CMP\tM", "CMP\tA",
 
-		"RNZ", "POP\tB", "JNZ\t#", "JMP\t#", "CNZ\t#", "PUSH\tB", "ADI\t*", "RST\t0", "RZ", "RET", "JZ\t#",
-		"!JMP\t#", "CZ\t#", "CALL\t#", "ACI\t*", "RST\t1", "RNC", "POP\tD", "JNC\t#", "OUT\t*", "CNC\t#", "PUSH\tD",
-		"SUI\t*", "RST\t2", "RC", "!RET", "JC\t#", "IN\t*", "CC\t#", "!CALL\t#", "SBI\t*", "RST\t3", "RPO",
-		"POP\tH", "JPO\t#", "XTHL", "CPO\t#", "PUSH\tH", "ANI\t*", "RST\t4", "RPE", "PCHL", "JPE\t#", "XCHG",
-		"CPE\t#", "!CALL\t#", "XRI\t*", "RST\t5", "RP", "POP\tPSW", "JP\t#", "DI", "CP\t#", "PUSH\tPSW", "ORI\t*",
-		"RST\t6", "RM", "SPHL", "JM\t#", "EI", "CM\t#", "!CALL\t#", "CPI\t*", "RST\t7"
-	};
+			"RNZ", "POP\tB",   "JNZ\t#", "JMP\t#",  "CNZ\t#", "PUSH\tB",   "ADI\t*", "RST\t0",
+			"RZ",  "RET",      "JZ\t#",  "!JMP\t#", "CZ\t#",  "CALL\t#",   "ACI\t*", "RST\t1",
+			"RNC", "POP\tD",   "JNC\t#", "OUT\t*",  "CNC\t#", "PUSH\tD",   "SUI\t*", "RST\t2",
+			"RC",  "!RET",     "JC\t#",  "IN\t*",   "CC\t#",  "!CALL\t#",  "SBI\t*", "RST\t3",
+			"RPO", "POP\tH",   "JPO\t#", "XTHL",    "CPO\t#", "PUSH\tH",   "ANI\t*", "RST\t4",
+			"RPE", "PCHL",     "JPE\t#", "XCHG",    "CPE\t#", "!CALL\t#",  "XRI\t*", "RST\t5",
+			"RP",  "POP\tPSW", "JP\t#",  "DI",      "CP\t#",  "PUSH\tPSW", "ORI\t*", "RST\t6",
+			"RM",  "SPHL",     "JM\t#",  "EI",      "CM\t#",  "!CALL\t#",  "CPI\t*", "RST\t7"
+		};
 
 	// -----------------------------------------------------------------------------
 	void render() {
@@ -277,11 +280,11 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 	// -----------------------------------------------------------------------------
 	void help() {
 		tty.setText("Key Bindings & Commands: tries to resemble SoftIce" + "\n" + "\nF1 - this help"
-			+ "\nESC - refresh window/exit from help" + "\n" + "\nUP - scroll code window up one byte"
-			+ "\nDOWN - scroll code window down one byte" + "\nEND - scroll code window down one page" + "\n"
-			+ "\nF8 - do one emulation step" + "\n" + "\ndADDR - dump from ADDR" + "\ntADDR - show ports from ADDR"
-			+ "\nuADDR - unassemble from ADDR" + "\ngADDR - go until ADDR" + "\nrREG=VAL - store VAL into REGister"
-			+ "\n. - unassemble from PC" + "");
+				+ "\nESC - refresh window/exit from help" + "\n" + "\nUP - scroll code window up one byte"
+				+ "\nDOWN - scroll code window down one byte" + "\nEND - scroll code window down one page" + "\n"
+				+ "\nF8 - do one emulation step" + "\n" + "\ndADDR - dump from ADDR" + "\ntADDR - show ports from ADDR"
+				+ "\nuADDR - unassemble from ADDR" + "\ngADDR - go until ADDR" + "\nrREG=VAL - store VAL into REGister"
+				+ "\n. - unassemble from PC");
 	}
 
 	// -----------------------------------------------------------------------------
@@ -401,8 +404,6 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 				peer.A(hex(op.substring(1)));
 			else if (op.startsWith("F"))
 				peer.F(hex(op.substring(1)));
-			else
-				;
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		}

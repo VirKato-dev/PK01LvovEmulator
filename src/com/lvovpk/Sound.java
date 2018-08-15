@@ -6,8 +6,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 /**
-	Sound Playing Primitives
-*/
+ * Sound Playing Primitives
+ */
 public class Sound {
 
 	private static SourceDataLine line;

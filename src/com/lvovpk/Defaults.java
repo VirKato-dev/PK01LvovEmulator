@@ -4,8 +4,8 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 /**
-	Emulator defaults
-*/
+ * Emulator defaults
+ */
 class Defaults {
 
 	static Dictionary<String, String> cfg;

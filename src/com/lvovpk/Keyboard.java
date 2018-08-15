@@ -4,8 +4,8 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 /**
-	Keyboard Abstraction layer
-*/
+ * Keyboard Abstraction layer
+ */
 class Keyboard {
 
 	public static Dictionary<String, Integer> as_int;

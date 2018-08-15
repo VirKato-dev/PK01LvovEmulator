@@ -7,8 +7,8 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 
 /**
-	Tool GUI Package
-*/
+ * Tool GUI Package
+ */
 public class GuiUtils implements ActionListener {
 	private int command;
 	private Gui peer;
@@ -33,7 +33,7 @@ public class GuiUtils implements ActionListener {
 
 	// -----------------------------------------------------------------------------
 	public static JMenuItem createMenuItem(int cmd, String face, char sc, Gui recv) {
-		JMenuItem Item = new JMenuItem(face/*, new MenuShortcut(sc)*/);
+		JMenuItem Item = new JMenuItem(face/* , new MenuShortcut(sc) */);
 		Item.addActionListener(new GuiUtils(recv, cmd));
 		return Item;
 	}

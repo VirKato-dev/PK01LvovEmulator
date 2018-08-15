@@ -1,39 +1,49 @@
 package com.lvovpk;
 
 /**
-	Debuggable Target
-*/
+ * Debuggable Target
+ */
 abstract class Debugger {
 
 	// -----------------------------------------------------------------------------
 	public abstract int A();
+
 	public abstract void A(int val);
 
 	public abstract int B();
+
 	public abstract void B(int val);
 
 	public abstract int C();
+
 	public abstract void C(int val);
 
 	public abstract int D();
+
 	public abstract void D(int val);
 
 	public abstract int E();
+
 	public abstract void E(int val);
 
 	public abstract int H();
+
 	public abstract void H(int val);
 
 	public abstract int L();
+
 	public abstract void L(int val);
 
 	public abstract int F();
+
 	public abstract void F(int val);
 
 	public abstract int PC();
+
 	public abstract void PC(int val);
 
 	public abstract int SP();
+
 	public abstract void SP(int val);
 
 	// -----------------------------------------------------------------------------
@@ -75,12 +85,15 @@ abstract class Debugger {
 
 	// -----------------------------------------------------------------------------
 	public abstract int CLK();
+
 	public abstract void CLK(int val);
 
 	public abstract int MEM(int addr);
+
 	public abstract void MEM(int addr, int val);
 
 	public abstract int IO(int addr);
+
 	public abstract void IO(int addr, int val);
 
 	public final int MEM2(int addr) {

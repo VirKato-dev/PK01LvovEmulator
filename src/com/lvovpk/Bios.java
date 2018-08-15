@@ -1,8 +1,8 @@
 package com.lvovpk;
 
 /**
-	Lvov BIOS v2.0 Description v3.0
-*/
+ * Lvov BIOS v2.0 Description v3.0
+ */
 class Bios {
 
 	// -----------------------------------------------------------------------------

@@ -1,15 +1,13 @@
 package com.lvovpk;
 
 /**
-    Abstract i8080 CPU based on unfinished Lvov Emulator attempt #2B4
-
-    --- v1.0 (c) 31-Aug-2003y by Hard Wisdom
-        Compiled code was cleaned and translated manually
-        Yes, I didn't written this code myself, I wrote
-        perl program to do it for me (Yes, it's internal,
-        may be I'll include this stuff into the next version
-        of emulator...)
-*/
+ * Abstract i8080 CPU based on unfinished Lvov Emulator attempt #2B4
+ * 
+ * --- v1.0 (c) 31-Aug-2003y by Hard Wisdom Compiled code was cleaned and
+ * translated manually Yes, I didn't written this code myself, I wrote perl
+ * program to do it for me (Yes, it's internal, may be I'll include this stuff
+ * into the next version of emulator...)
+ */
 abstract class I8080
 {
 ////////

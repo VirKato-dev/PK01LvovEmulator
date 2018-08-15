@@ -17,8 +17,8 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
 /**
-	Simple Text Editor
-*/
+ * Simple Text Editor
+ */
 class EditorWindow extends JDialog implements ActionListener, WindowListener {
 	/**
 	 * 
@@ -76,7 +76,7 @@ class EditorWindow extends JDialog implements ActionListener, WindowListener {
 
 		txt = new JTextArea("");
 		txt.setFont(new Font("Monospaced", Font.BOLD, 14));
-		
+
 		JScrollPane sp = new JScrollPane(txt);
 		sp.setBounds(0, 0, 400, 400);
 		sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -100,12 +100,11 @@ class EditorWindow extends JDialog implements ActionListener, WindowListener {
 
 	// -----------------------------------------------------------------------------
 
-	/*public void show() {
-		setLocation((getParent().getSize().width - getSize().width) / 2,
-				(getParent().getSize().height - getSize().height) / 2);
-		validate();
-		super.show();
-	}*/
+	/*
+	 * public void show() { setLocation((getParent().getSize().width -
+	 * getSize().width) / 2, (getParent().getSize().height - getSize().height) /
+	 * 2); validate(); super.show(); }
+	 */
 
 	// -----------------------------------------------------------------------------
 	void setPeer(int cmdIn, int cmdOut, Gui peer) {

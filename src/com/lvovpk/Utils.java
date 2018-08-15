@@ -15,8 +15,8 @@ import java.util.zip.GZIPOutputStream;
 import javax.swing.JFrame;
 
 /**
-	Supplementary Tools
-*/
+ * Supplementary Tools
+ */
 public class Utils {
 
 	// -----------------------------------------------------------------------------
@@ -34,13 +34,15 @@ public class Utils {
 			vct.insertElementAt(key, i);
 		}
 
-		String Result[] = new String[vct.size()]; // then prepare data for client
+		String Result[] = new String[vct.size()]; // then prepare data for
+													// client
 
 		if (ascend)
 			for (i = 0; i < vct.size(); i++) // ok, leave intact
 				Result[i] = vct.elementAt(i).toString();
 		else
-			for (i = 0; i < vct.size(); i++) // hmm, needs to reverse order of data
+			for (i = 0; i < vct.size(); i++) // hmm, needs to reverse order of
+												// data
 				Result[vct.size() - i - 1] = vct.elementAt(i).toString();
 
 		return Result;

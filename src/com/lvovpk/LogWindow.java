@@ -17,7 +17,7 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
 /**
-	Events Log Window
+ * Events Log Window
  */
 public class LogWindow extends JDialog implements ActionListener, WindowListener {
 	/**
@@ -54,18 +54,18 @@ public class LogWindow extends JDialog implements ActionListener, WindowListener
 		logText = new JTextArea("");
 		logText.setEditable(false);
 		logText.setFont(new Font("Monospaced", Font.BOLD, 14));
-		
+
 		JScrollPane sp = new JScrollPane(logText);
 		sp.setBounds(0, 0, 450, 400);
 		sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		
+
 		add(sp, BorderLayout.CENTER);
 		add(tbb, BorderLayout.SOUTH);
 
 		tb.add(clearButton = new JButton("Clear log"));
 		tb.add(closeButton = new JButton("Close"));
 		tbb.add(tb, BorderLayout.CENTER);
-		
+
 		clearButton.addActionListener(this);
 		closeButton.addActionListener(this);
 

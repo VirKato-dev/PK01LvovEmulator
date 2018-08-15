@@ -12,8 +12,8 @@ import java.io.OutputStream;
 import java.util.Hashtable;
 
 /**
-	LVOV Software Abstraction
-*/
+ * LVOV Software Abstraction
+ */
 abstract class PK00 extends Canvas implements KeyListener {
 
 	/**
@@ -25,7 +25,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 	final static int mode_3x2_interlaced = 2;
 	final static int mode_1x1_solid = 3;
 	final static int mode_last = 3;
-	
+
 	Lvov pk;
 
 	// -----------------------------------------------------------------------------

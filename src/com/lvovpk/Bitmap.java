@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
-	Windows Bitmaps Handling Primitives
-*/
+ * Windows Bitmaps Handling Primitives
+ */
 public class Bitmap {
 
 	// -----------------------------------------------------------------------------
 	// % 8 dots per row !
-	public static void save4 (OutputStream To, byte[] body, int X, int Y, byte[][] pal, int C) throws IOException {
+	public static void save4(OutputStream To, byte[] body, int X, int Y, byte[][] pal, int C) throws IOException {
 		final int sizeFileHdr = 14;
 		final int sizeInfoHdr = 40;
 
