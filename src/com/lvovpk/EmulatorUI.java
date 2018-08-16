@@ -199,9 +199,9 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			} else {
 				if (mi.getItemCount() > 0)
 					mn.addSeparator();
-				int ii = mi.getItemCount(); // it seems that getItem(i)
+				int ii = mi.getItemCount();
 				for (int i = 0; i < ii; i++)
-					mn.add(mi.getItem(0)); // removes item(i)
+					mn.add(mi.getItem(0));
 			}
 		} else {
 			mb = (JMenuBar) mc;
@@ -278,7 +278,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		mkMenuItem(submn, Name, "Export", cmExport, "Export Basic program");
 		mkMenuItem(submn, Name, "DumpF", cmDumpF, "Perform full dump of the emulator state");
 		mkMenuItem(submn, Name, "DumpP", cmDumpP, "Perform partial dump of the emulator state");
-		mkMenuItem(submn, Name, "Snap", cmSnap, "Make screen snapshot");
+		mkMenuItem(submn, Name, "Snap", cmSnap, "Take a screenshot");
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("General");
