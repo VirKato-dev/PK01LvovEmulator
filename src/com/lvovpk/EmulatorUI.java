@@ -270,14 +270,14 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		submn = new JMenu("Load");
 		mkMenuItem(submn, Name, "Load", cmLoad, "Load program");
 		mkMenuItem(submn, Name, "Import", cmImport, "Import Basic program");
-		mkMenuItem(submn, Name, "Edit", cmInvokeEditor, "Open external editor for Basic");
+		mkMenuItem(submn, Name, "Edit", cmInvokeEditor, "Open editor for Basic");
 		mkMenuItem(submn, Name, "Restore", cmRestore, "Restore state from the dump");
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("Store");
 		mkMenuItem(submn, Name, "Export", cmExport, "Export Basic program");
-		mkMenuItem(submn, Name, "DumpF", cmDumpF, "Perform full dump of emulator state");
-		mkMenuItem(submn, Name, "DumpP", cmDumpP, "Perform partial dump of emulator state");
+		mkMenuItem(submn, Name, "DumpF", cmDumpF, "Perform full dump of the emulator state");
+		mkMenuItem(submn, Name, "DumpP", cmDumpP, "Perform partial dump of the emulator state");
 		mkMenuItem(submn, Name, "Snap", cmSnap, "Make screen snapshot");
 		mkMenuMenu(mn, submn, flatten);
 

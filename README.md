@@ -15,7 +15,12 @@ Build with:
 
 Run with:
 
-    java -jar target/PK01LvovEmulator.jar
+    java -jar PK01LvovEmulator.jar
+
+For keyboard layout reference see the "keyboard.png" file.
+
+External programs (*.LVT files) can be loaded using "Load program" from the menu.
+You can also import a BASIC program (like "sample.bas"), edit it in internal editor and run it by typing "RUN" (or just by pressing NumLock).
 
 The emulator is distributed under the terms of GNU General Public License version 2.
 
@@ -38,6 +43,11 @@ The emulator is distributed under the terms of GNU General Public License versio
 
 Для запуска:
 
-    java -jar target/PK01LvovEmulator.jar
+    java -jar PK01LvovEmulator.jar
+
+Раскладка клавиатуры указана в файле "keyboard.png".
+
+Внешние программы (*.LVT файлы) можно загрузить с помощью "Load program" из меню.
+Также можно импортировать программу на BASIC (например, "sample.bas"), отредактировать ее во внутреннем редакторе и запустить, набрав "RUN" (или просто нажав NumLock).
 
 Эмулятор распространяется на условиях GNU General Public License version 2.
