@@ -71,6 +71,8 @@ public class LogWindow extends JDialog implements ActionListener, WindowListener
 
 		addWindowListener(this);
 		setSize(480, 400);
+		setLocation(100, 100);
+		validate();
 	}
 
 	public void appendToLog(String msg) {

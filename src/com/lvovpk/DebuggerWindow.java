@@ -75,6 +75,8 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 		cmdLine.addKeyListener(this);
 		addWindowListener(this);
 		setSize(550, 680);
+		setLocation(100, 100);
+		validate();
 	}
 
 	// -----------------------------------------------------------------------------
@@ -279,7 +281,7 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 
 	// -----------------------------------------------------------------------------
 	void help() {
-		tty.setText("Key Bindings & Commands: tries to resemble SoftIce" + "\n" + "\nF1 - this help"
+		tty.setText("Key Bindings & Commands:" + "\n" + "\nF1 - this help"
 				+ "\nESC - refresh window/exit from help" + "\n" + "\nUP - scroll code window up one byte"
 				+ "\nDOWN - scroll code window down one byte" + "\nEND - scroll code window down one page" + "\n"
 				+ "\nF8 - do one emulation step" + "\n" + "\ndADDR - dump from ADDR" + "\ntADDR - show ports from ADDR"

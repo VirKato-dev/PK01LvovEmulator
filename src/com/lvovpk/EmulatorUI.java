@@ -89,12 +89,14 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		writeLog("Loading configurations from file...");
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tf));
-			Defaults.cfg = new Hashtable<String, String>();
 			String line = reader.readLine();
 			while (line != null) {
-				if (line != null && line.length() > 3 && !line.trim().startsWith("#")) {
-					String[] values = line.split("#")[0].split(" ");
-					Defaults.cfg.put(values[0], values[values.length - 1]);
+				line = line.trim();
+				if (line.length() >= 3 && !line.startsWith("#")) {
+					String[] values = line.split("#")[0].trim().split(" ");
+					if (values.length > 1) {
+						Defaults.cfg.put(values[0], values[values.length - 1]);
+					}
 				}
 				line = reader.readLine();
 			}
@@ -562,7 +564,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			setIconImage(createImage((ImageProducer) getClass().getResource("pk01lvov.gif").getContent()));
 		} catch (IOException e) {
 		}
-		
+
 		if (configFileName != null) {
 			config_load(configFileName);
 		}

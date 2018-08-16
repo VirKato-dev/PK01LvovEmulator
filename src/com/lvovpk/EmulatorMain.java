@@ -21,9 +21,9 @@ public class EmulatorMain extends EmulatorUI {
 	@Override
 	public void init() {
 		super.init();
-		if (init_failed == null && args != null && args.length >= 1 && !args[0].equals("-l"))
+		if (init_failed == null && args != null && args.length >= 1 && !args[0].equals("-r"))
 			restore(args[0]);
-		else if (init_failed == null && args != null && args.length >= 3 && args[0].equals("-l"))
+		else if (init_failed == null && args != null && args.length >= 3 && args[0].equals("-r"))
 			restore(args[2]);
 	}
 
@@ -53,10 +53,11 @@ public class EmulatorMain extends EmulatorUI {
 	public static void main(String[] args) throws Exception {
 		try {
 			EmulatorMain em = new EmulatorMain();
-			if (args.length <= 0 || args[0].equals("-l") || !args[0].startsWith("-")) {
+			if (args.length <= 0 || args[0].equals("-r") || !args[0].startsWith("-")) {
 
-				if (args.length > 0 && args[0].equals("-l"))
+				if (args.length > 1 && args[0].equals("-r")) {
 					em.setConfigFileName(args[1]);
+				}
 
 				em.args = args;
 
@@ -95,7 +96,7 @@ public class EmulatorMain extends EmulatorUI {
 			// -----------------------------------------------------------------------------
 			else {
 				System.out.println("USAGE: PK01LvovEmulator.jar -d <conf_file> to dump default configurations\n"
-						+ "                  -l <conf_file> to replace default configurations\n"
+						+ "                  -r <conf_file> to replace default configurations\n"
 						+ "                  -p <basic_file> to produce basic .lvt from textual stdin\n"
 						+ "                     -p866 -p1251 -pkoi8 allows you to specify codepage,\n"
 						+ "                     -p just uses default and it isn't good on wintel\n"

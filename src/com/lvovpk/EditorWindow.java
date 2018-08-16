@@ -78,7 +78,7 @@ class EditorWindow extends JDialog implements ActionListener, WindowListener {
 		txt.setFont(new Font("Monospaced", Font.BOLD, 14));
 
 		JScrollPane sp = new JScrollPane(txt);
-		sp.setBounds(0, 0, 400, 400);
+		sp.setBounds(0, 0, 450, 500);
 		sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		add(sp, BorderLayout.CENTER);
 		add(tbb, BorderLayout.SOUTH);
@@ -95,16 +95,10 @@ class EditorWindow extends JDialog implements ActionListener, WindowListener {
 		cancel.addActionListener(this);
 
 		addWindowListener(this);
-		setSize(450, 400);
+		setSize(500, 550);
+		setLocation(100, 100);
+		validate();
 	}
-
-	// -----------------------------------------------------------------------------
-
-	/*
-	 * public void show() { setLocation((getParent().getSize().width -
-	 * getSize().width) / 2, (getParent().getSize().height - getSize().height) /
-	 * 2); validate(); super.show(); }
-	 */
 
 	// -----------------------------------------------------------------------------
 	void setPeer(int cmdIn, int cmdOut, Gui peer) {
