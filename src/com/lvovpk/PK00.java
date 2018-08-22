@@ -21,18 +21,19 @@ abstract class PK00 extends Canvas implements KeyListener {
 	 */
 	private static final long serialVersionUID = -5674032851714416043L;
 	final static int mode_first = 1;
-	final static int mode_3x2_solid = 1;
-	final static int mode_3x2_interlaced = 2;
-	final static int mode_1x1_solid = 3;
-	final static int mode_last = 3;
+	final static int mode_last = 11;
 
+	private int scaleX = 1;
+	private int scaleY = 1;
+	private int[][] scaleFactors = { {1, 1}, {2, 2}, {3, 2}, {5, 3}, {6, 4}, {7, 4} };
+	
 	Lvov pk;
 
 	// -----------------------------------------------------------------------------
 	// C o m p o n e n t I m p l e m e n t a t i o n
 	// -----------------------------------------------------------------------------
 	PK00() {
-		this(mode_1x1_solid);
+		this(mode_first);
 	}
 
 	PK00(int mode) {
@@ -45,10 +46,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// -----------------------------------------------------------------------------
 	@Override
 	public Dimension getPreferredSize() {
-		if (render_3x2)
-			return new Dimension(3 * 256, 2 * 256);
-		else
-			return new Dimension(256, 256);
+		return new Dimension(scaleX * 256, scaleY * 256);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -137,10 +135,10 @@ abstract class PK00 extends Canvas implements KeyListener {
 				(byte)0xC0, (byte)0xC0, (byte)0xC0, (byte)0xFF };
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private boolean render_3x2, render_interlaced;
+	private boolean render_interlaced;
 	private Image v_img;
 	private MemoryImageSource v_src;
-	private byte[] v_mem = new byte[256 * 3 * 256 * 2]; // 768x512 or 256x256
+	private byte[] v_mem = new byte[256 * 7 * 256 * 4]; // up to 1792x1024
 	private byte[][] v_pal = new byte[256][4];
 
 	// -----------------------------------------------------------------------------
@@ -153,52 +151,27 @@ abstract class PK00 extends Canvas implements KeyListener {
 
 	// -----------------------------------------------------------------------------
 	private void update_v_line(int line) {
-		if (render_3x2) {
-			update_v_line_3x2(line, true);
-			update_v_line_3x2(line, false);
-		} else
-			update_v_line_1x1(line);
-	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private void update_v_line_1x1(int line) {
-		int i, j, p;
-		byte[] c;
-		for (i = line, j = line + 64, p = i << 2; i < j; i++) {
-			c = v_pal[pk.video[i]];
-			v_mem[p++] = c[0];
-			v_mem[p++] = c[1];
-			v_mem[p++] = c[2];
-			v_mem[p++] = c[3];
+		for (int i = 0; i < scaleY; i++) {
+			update_v_line(line, i);
 		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private void update_v_line_3x2(int line, boolean first) {
-		int i = line, j = line + 64, p = i * 4 * 3 * 2 + (first ? 0 : 3 * 256);
+	private void update_v_line(int line, int row) {
+		int i = line, j = line + 64, p = i * 4 * scaleX * scaleY + (row * scaleX * 256);
 		byte c[];
-
-		if (render_interlaced && first) {
-			for (i = p, j = p + 64 * 4 * 3; i < j; i++)
+		
+		if (render_interlaced && scaleY > 1 && row >= (scaleY >> 1)) {
+			for (i = p, j = p + 64 * 4 * scaleX; i < j; i++)
 				v_mem[p++] = 0;
 		} else {
 			for (; i < j; i++) {
 				c = v_pal[pk.video[i]];
-				v_mem[p++] = c[0];
-				v_mem[p++] = c[0];
-				v_mem[p++] = c[0];
-
-				v_mem[p++] = c[1];
-				v_mem[p++] = c[1];
-				v_mem[p++] = c[1];
-
-				v_mem[p++] = c[2];
-				v_mem[p++] = c[2];
-				v_mem[p++] = c[2];
-
-				v_mem[p++] = c[3];
-				v_mem[p++] = c[3];
-				v_mem[p++] = c[3];
+				for (int v = 0; v < 4; v++) {
+					for (int s = 0; s < scaleX; s++) {
+						v_mem[p++] = c[v];
+					}
+				}
 			}
 		}
 	}
@@ -221,10 +194,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 					pk.dirty[j] = false;
 				}
 				if (j > i) {
-					if (render_3x2)
-						v_src.newPixels(0, 2 * i, 3 * 256, 2 * (j - i));
-					else
-						v_src.newPixels(0, i, 256, j - i);
+					v_src.newPixels(0, scaleY * i, scaleX * 256, scaleY * (j - i));
 					i = j;
 				}
 			}
@@ -234,15 +204,10 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// -----------------------------------------------------------------------------
 	void render_as(int mode) {
 		pk.dirty = null;
-		if (mode == mode_3x2_solid || mode == mode_3x2_interlaced) {
-			render_3x2 = true;
-			if (mode == mode_3x2_interlaced)
-				render_interlaced = true;
-			v_src = new MemoryImageSource(256 * 3, 256 * 2, new IndexColorModel(8, 8, r, g, b), v_mem, 0, 256 * 3);
-		} else {
-			render_3x2 = render_interlaced = false;
-			v_src = new MemoryImageSource(256, 256, new IndexColorModel(8, 8, r, g, b), v_mem, 0, 256);
-		}
+		render_interlaced = (mode > 1 && mode % 2 != 0);
+		scaleX = scaleFactors[mode / 2][0];
+		scaleY = scaleFactors[mode / 2][1];
+		v_src = new MemoryImageSource(256 * scaleX, 256 * scaleY, new IndexColorModel(8, 8, r, g, b), v_mem, 0, 256 * scaleX);
 		v_src.setAnimated(true);
 		v_src.setFullBufferUpdates(false);
 		v_img = createImage(v_src);
@@ -257,10 +222,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 
 	// -----------------------------------------------------------------------------
 	void snapshot(OutputStream To) throws Exception {
-		if (render_3x2)
-			Bitmap.save4(To, v_mem, 3 * 256, 2 * 256, new byte[][] { r, g, b }, 8);
-		else
-			Bitmap.save4(To, v_mem, 256, 256, new byte[][] { r, g, b }, 8);
+		Bitmap.save4(To, v_mem, scaleX * 256, scaleY * 256, new byte[][] { r, g, b }, 8);
 	}
 
 	// -----------------------------------------------------------------------------

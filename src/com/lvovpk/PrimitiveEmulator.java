@@ -117,7 +117,7 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 			start_cycle = System.currentTimeMillis();
 			lv.update_image();
 			frames++;
-			lv.emulate(25000); // Cause 2.5MHz and 50 Fps
+			lv.emulate(Integer.parseInt(cfg("CpuTicks")));
 			stop_cycle = System.currentTimeMillis();
 			wait_cycle = (int) (stop_cycle - start_cycle);
 
@@ -222,15 +222,7 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 			setLayout(fly);
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			if (cfg("Mode", "3x2i"))
-				mode = PK01.mode_3x2_interlaced;
-			else if (cfg("Mode", "3x2s"))
-				mode = PK01.mode_3x2_solid;
-			else if (cfg("Mode", "1x1s"))
-				mode = PK01.mode_1x1_solid;
-			else
-				mode = PK01.mode_3x2_interlaced;
-
+			mode = Integer.parseInt(cfg("Mode"));
 			lv = new PK01(mode);
 			go_fast = !cfg("Sync", "yes");
 			lv.pk.halt_if_invalid = cfg("HALT_ON_INVALID", "yes");

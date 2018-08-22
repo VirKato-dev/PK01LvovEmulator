@@ -1,13 +1,18 @@
 package com.lvovpk;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+
+import javax.imageio.ImageIO;
 
 /**
  * Extended Lvov Emulator
@@ -295,14 +300,31 @@ public class ExtendedEmulator extends PrimitiveEmulator {
 
 	// -----------------------------------------------------------------------------
 	boolean snap(String name) {
-		writeLog("Doing screen snapshot...");
+		writeLog("Taking a screenshot...");
 		try {
-			OutputStream Snap = Utils.ZIP(name, new FileOutputStream(name));
-			lv.snapshot(Snap);
-			Snap.close();
+			String fortmatName = Utils.getFileExtension(name);
+			if (fortmatName.equalsIgnoreCase("bmp")) {
+				OutputStream snap = Utils.ZIP(name, new FileOutputStream(name));
+				lv.snapshot(snap);
+				snap.close();
+			}
+			else {
+				BufferedImage image = new BufferedImage(lv.getWidth(), lv.getHeight(), BufferedImage.TYPE_INT_RGB);
+				Graphics2D g2d = image.createGraphics();
+				lv.paint(g2d);
+				if (fortmatName.equalsIgnoreCase("png")
+					|| fortmatName.equalsIgnoreCase("gif")
+					|| fortmatName.equalsIgnoreCase("jpg")) {
+						ImageIO.write(image, fortmatName, new File(name));
+				}
+				else {
+					ImageIO.write(image, "png", new File(name + ".png"));
+				}
+				g2d.dispose();
+			}
 			return true;
 		} catch (Exception ex) {
-			writeLog("Unable to snap screen: " + ex);
+			writeLog("Unable to take a screenshot: " + ex);
 			return false;
 		}
 	}
@@ -369,7 +391,6 @@ public class ExtendedEmulator extends PrimitiveEmulator {
 				}
 				return;
 			case cmMode:
-				// writeLog("Switching rendering mode.");
 				if (mode < PK00.mode_last)
 					mode++;
 				else

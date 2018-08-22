@@ -21,8 +21,9 @@ class Defaults {
 		cfg.put("SpeakMode", "2");
 		cfg.put("SpeakSlow", "No");
 		cfg.put("Printer", "<none>");
-		cfg.put("Mode", "3x2s");
+		cfg.put("Mode", "4");
 		cfg.put("Sync", "Yes");
+		cfg.put("CpuTicks", "25000"); // Cause 2.5MHz and 50 Fps
 
 		// -----------------------------------------------------------------------------
 		// Keyboard

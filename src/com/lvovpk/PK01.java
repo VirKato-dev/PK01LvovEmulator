@@ -17,7 +17,7 @@ class PK01 extends PK00 {
 	// Bios def
 	// --------------------------------------------------------------------
 	PK01() {
-		super(mode_1x1_solid);
+		super(mode_first);
 	}
 
 	PK01(int mode) {

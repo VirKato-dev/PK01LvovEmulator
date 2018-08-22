@@ -508,7 +508,9 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmSnap:
-			fn = Utils.mkFile(this, "Choose destination .BMP file", "*.bmp");
+			do_pause();
+			fn = Utils.mkFile(this, "Choose destination image file", "*.png;*.gif;*.jpg;*.bmp");
+			do_resume();
 			if (fn != null)
 				do_snap(fn);
 			break;
@@ -547,7 +549,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	private void showAboutDialog() {
 		JOptionPane.showMessageDialog(this,
-				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.1\n"
+				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.2\n"
 						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n" + "(c) 2018 by Izhak Serovsky \n\n"
 						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
 						+ "The emulator is distributed under the GNU General Public License version 2");
