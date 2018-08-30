@@ -302,8 +302,8 @@ public class ExtendedEmulator extends PrimitiveEmulator {
 	boolean snap(String name) {
 		writeLog("Taking a screenshot...");
 		try {
-			String fortmatName = Utils.getFileExtension(name);
-			if (fortmatName.equalsIgnoreCase("bmp")) {
+			String fortmatName = Utils.getFileExtension(name).toLowerCase();
+			if (fortmatName.equals("bmp")) {
 				OutputStream snap = Utils.ZIP(name, new FileOutputStream(name));
 				lv.snapshot(snap);
 				snap.close();
@@ -312,9 +312,9 @@ public class ExtendedEmulator extends PrimitiveEmulator {
 				BufferedImage image = new BufferedImage(lv.getWidth(), lv.getHeight(), BufferedImage.TYPE_INT_RGB);
 				Graphics2D g2d = image.createGraphics();
 				lv.paint(g2d);
-				if (fortmatName.equalsIgnoreCase("png")
-					|| fortmatName.equalsIgnoreCase("gif")
-					|| fortmatName.equalsIgnoreCase("jpg")) {
+				if (fortmatName.equals("png")
+					|| fortmatName.equals("gif")
+					|| fortmatName.equals("jpg")) {
 						ImageIO.write(image, fortmatName, new File(name));
 				}
 				else {

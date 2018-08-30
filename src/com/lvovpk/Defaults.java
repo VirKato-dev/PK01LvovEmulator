@@ -24,6 +24,8 @@ class Defaults {
 		cfg.put("Mode", "4");
 		cfg.put("Sync", "Yes");
 		cfg.put("CpuTicks", "25000"); // Cause 2.5MHz and 50 Fps
+		cfg.put("FullScreen", "No");
+		cfg.put("KeyboardShortcuts", "Yes");
 
 		// -----------------------------------------------------------------------------
 		// Keyboard

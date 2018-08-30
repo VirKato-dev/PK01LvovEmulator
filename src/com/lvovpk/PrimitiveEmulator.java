@@ -1,6 +1,9 @@
 package com.lvovpk;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,20 +29,22 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 	int mode;
 	PK01 lv;
 	int ireq;
-	boolean go_fast, go_sound, speak_slow;
+	boolean go_fast, go_sound, speak_slow, fullScreen;
 	int speak_mode;
 	byte volume_up = 127, volume_down = 127;
 	Thread framer;
-	BorderLayout fly;
+	LayoutManager fly;
 	String init_failed = null;
 	OutputStream printerDevice;
 
 	// -----------------------------------------------------------------------------
 	@Override
 	public void validate() {
-		LayoutManager fly = getLayout();
-		if (fly != null)
-			setSize(fly.preferredLayoutSize(this));
+		if (!fullScreen) {
+			LayoutManager fly = getLayout();
+			if (fly != null)
+				setSize(fly.preferredLayoutSize(this));
+		}
 		super.validate();
 	}
 
@@ -175,6 +180,7 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 	public void start() {
 		if (init_failed != null)
 			return;
+		lv.requestFocusInWindow();
 		if (framer == null)
 			framer = new Thread(this);
 		if (!framer.isAlive())
@@ -216,13 +222,21 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 		try {
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			fly = new BorderLayout();
-			fly.setHgap(0);
-			fly.setVgap(0);
-			setLayout(fly);
-
+			fullScreen = cfg("FullScreen", "yes");
+			if (fullScreen) {
+				try {
+					setExtendedState(JFrame.MAXIMIZED_BOTH); 
+					setUndecorated(true);
+				}
+				catch(Exception e) {
+					fullScreen = false;
+				}
+			}
+			getContentPane().setBackground(Color.BLACK);
+			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			mode = Integer.parseInt(cfg("Mode"));
+			
 			lv = new PK01(mode);
 			go_fast = !cfg("Sync", "yes");
 			lv.pk.halt_if_invalid = cfg("HALT_ON_INVALID", "yes");
@@ -290,8 +304,18 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 			}
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			add(lv, BorderLayout.CENTER);
-			setSize(fly.preferredLayoutSize(this));
+			if (fullScreen) {
+				fly = new GridBagLayout();
+				setLayout(fly);
+				add(lv, new GridBagConstraints());
+			}
+			else {
+				fly = new BorderLayout(0, 0);
+				setLayout(fly);
+				add(lv, BorderLayout.CENTER);
+				setSize(fly.preferredLayoutSize(this));
+			}
+			
 			ireq = cmRepaint;
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -159,7 +159,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private void update_v_line(int line, int row) {
 		int i = line, j = line + 64, p = i * 4 * scaleX * scaleY + (row * scaleX * 256);
-		byte c[];
+		byte[] c;
 		
 		if (render_interlaced && scaleY > 1 && row >= (scaleY >> 1)) {
 			for (i = p, j = p + 64 * 4 * scaleX; i < j; i++)

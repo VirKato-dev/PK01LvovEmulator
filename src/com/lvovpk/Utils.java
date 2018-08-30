@@ -1,6 +1,5 @@
 package com.lvovpk;
 
-import java.awt.FileDialog;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
@@ -12,7 +11,9 @@ import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Supplementary Tools
@@ -226,18 +227,47 @@ public class Utils {
 	}
 
 	// -----------------------------------------------------------------------------
-	public static String useFileAsURL(JFrame Wnd, String Title, String Mask) {
-		FileDialog dlg = new FileDialog(Wnd, Title, FileDialog.LOAD);
-		dlg.setFile(Mask);
-		dlg.setVisible(true);
-		return dlg.getFile() == null ? null : dlg.getDirectory() + dlg.getFile();
+	public static String useFileAsURL(JFrame wnd, String title, String... masks) {
+		JFileChooser dlg = new JFileChooser();
+		dlg.setDialogTitle(title);
+		dlg.setAcceptAllFileFilterUsed(false);
+		for (String mask : masks) {
+			String[] maskArr = mask.split("#");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+					(maskArr.length > 1 ? maskArr[0] : "*." + maskArr[0]), maskArr[maskArr.length - 1].split(";"));
+			dlg.addChoosableFileFilter(filter);
+		}
+
+		int returnValue = dlg.showOpenDialog(wnd);
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			return dlg.getSelectedFile().getPath();
+		}
+		return null;
 	}
 
-	public static String mkFile(JFrame Wnd, String Title, String Mask) {
-		FileDialog dlg = new FileDialog(Wnd, Title, FileDialog.SAVE);
-		dlg.setFile(Mask);
-		dlg.setVisible(true);
-		return dlg.getFile() == null ? null : dlg.getDirectory() + dlg.getFile();
+	public static String mkFile(JFrame wnd, String title, String... masks) {
+		JFileChooser dlg = new JFileChooser();
+		dlg.setDialogTitle(title);
+		dlg.setAcceptAllFileFilterUsed(false);
+		for (String mask : masks) {
+			String[] maskArr = mask.split("#");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+					(maskArr.length > 1 ? maskArr[0] : "*." + maskArr[0]), maskArr[maskArr.length - 1].split(";"));
+			dlg.addChoosableFileFilter(filter);
+		}
+
+		int returnValue = dlg.showSaveDialog(wnd);
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			String filePath = dlg.getSelectedFile().getPath();
+			String[] extensions = ((FileNameExtensionFilter)dlg.getFileFilter()).getExtensions();
+			for (String extension : extensions) {
+				if (getFileExtension(filePath).equalsIgnoreCase(extension)) {
+					return filePath;
+				}
+			}
+			return dlg.getSelectedFile().getPath() + "." + extensions[0];
+		}
+		return null;
 	}
 	
 	public static String getFileExtension(String fileName) {

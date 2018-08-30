@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 /**
  * Tool GUI Package
@@ -32,10 +33,11 @@ public class GuiUtils implements ActionListener {
 	}
 
 	// -----------------------------------------------------------------------------
-	public static JMenuItem createMenuItem(int cmd, String face, char sc, Gui recv) {
-		JMenuItem Item = new JMenuItem(face/* , new MenuShortcut(sc) */);
-		Item.addActionListener(new GuiUtils(recv, cmd));
-		return Item;
+	public static JMenuItem createMenuItem(int cmd, String face, int keyCode, int modifiers, Gui recv) {
+		JMenuItem item = new JMenuItem(face);
+		item.setAccelerator(KeyStroke.getKeyStroke(keyCode, modifiers));
+		item.addActionListener(new GuiUtils(recv, cmd));
+		return item;
 	}
 
 	// -----------------------------------------------------------------------------

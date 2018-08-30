@@ -53,6 +53,8 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	private JLabel st;
 	
 	private String configFileName = null;
+	private int menuShortcutKeyMask;
+	private boolean keyboardShortcuts;
 
 	public final void do_config_dump(String Name) {
 		config_dump(Name);
@@ -166,7 +168,6 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		};
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		config.put("ESC_Debug", "Yes");
 		config.put("Enable_FlatContextMenu", "Yes");
 		for (int i = 0; i < Menus.length; i++) {
 			config.put("Enable_" + Menus[i][0], Menus[i][1]);
@@ -179,6 +180,18 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	private void mkMenuItem(JMenu mn, String Name, String Feature, int Command, String Description) {
 		if (cfg("Enable_" + Name + "_" + Feature + "_Feature", "yes"))
 			mn.add(GuiUtils.createMenuItem(Command, Description, this));
+	}
+	
+	// -----------------------------------------------------------------------------
+	private void mkMenuItem(JMenu mn, String Name, String Feature, int Command, String Description, int keyCode, int modifiers) {
+		if (cfg("Enable_" + Name + "_" + Feature + "_Feature", "yes")) {
+			if (keyboardShortcuts) {
+				mn.add(GuiUtils.createMenuItem(Command, Description, keyCode, modifiers, this));
+			}
+			else {
+				mn.add(GuiUtils.createMenuItem(Command, Description, this));
+			}
+		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -247,7 +260,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		JMenu submn;
 
 		submn = new JMenu("Config");
-		mkMenuItem(submn, Name, "Mode", cmMode, "Change rendering mode");
+		mkMenuItem(submn, Name, "Mode", cmMode, "Change rendering mode", KeyEvent.VK_F8, menuShortcutKeyMask);
 		mkMenuItem(submn, Name, "Fast", cmFast, "Emulate at full speed");
 		mkMenuItem(submn, Name, "Slow", cmSlow, "Emulate at real speed");
 		mkMenuItem(submn, Name, "PRN_O", cmOpenPRN, "Open printer");
@@ -261,31 +274,31 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("Control");
-		mkMenuItem(submn, Name, "Reset", cmReset, "Perform cold start sequence");
-		mkMenuItem(submn, Name, "Pause", cmPause, "Pause execution");
-		mkMenuItem(submn, Name, "Resume", cmResume, "Resume execution");
-		mkMenuItem(submn, Name, "Debug", cmInvokeDebugger, "Invoke Code Debugger");
+		mkMenuItem(submn, Name, "Reset", cmReset, "Perform cold start sequence", KeyEvent.VK_F6, menuShortcutKeyMask);
+		mkMenuItem(submn, Name, "Pause", cmPause, "Pause execution", KeyEvent.VK_P, menuShortcutKeyMask);
+		mkMenuItem(submn, Name, "Resume", cmResume, "Resume execution", KeyEvent.VK_C, menuShortcutKeyMask);
+		mkMenuItem(submn, Name, "Debug", cmInvokeDebugger, "Invoke Code Debugger", KeyEvent.VK_ESCAPE, 0);
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("Load");
-		mkMenuItem(submn, Name, "Load", cmLoad, "Load program");
-		mkMenuItem(submn, Name, "Import", cmImport, "Import Basic program");
-		mkMenuItem(submn, Name, "Edit", cmInvokeEditor, "Open editor for Basic");
-		mkMenuItem(submn, Name, "Restore", cmRestore, "Restore state from the dump");
+		mkMenuItem(submn, Name, "Load", cmLoad, "Load program", KeyEvent.VK_L, menuShortcutKeyMask);
+		mkMenuItem(submn, Name, "Import", cmImport, "Import Basic program", KeyEvent.VK_I, menuShortcutKeyMask);
+		mkMenuItem(submn, Name, "Edit", cmInvokeEditor, "Open editor for Basic", KeyEvent.VK_B, menuShortcutKeyMask);
+		mkMenuItem(submn, Name, "Restore", cmRestore, "Restore state from the dump", KeyEvent.VK_R, menuShortcutKeyMask);
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("Store");
-		mkMenuItem(submn, Name, "Export", cmExport, "Export Basic program");
-		mkMenuItem(submn, Name, "DumpF", cmDumpF, "Perform full dump of the emulator state");
+		mkMenuItem(submn, Name, "Export", cmExport, "Export Basic program", KeyEvent.VK_E, menuShortcutKeyMask);
+		mkMenuItem(submn, Name, "DumpF", cmDumpF, "Perform full dump of the emulator state", KeyEvent.VK_D, menuShortcutKeyMask);
 		mkMenuItem(submn, Name, "DumpP", cmDumpP, "Perform partial dump of the emulator state");
-		mkMenuItem(submn, Name, "Snap", cmSnap, "Take a screenshot");
+		mkMenuItem(submn, Name, "Snap", cmSnap, "Take a screenshot", KeyEvent.VK_F5, menuShortcutKeyMask);
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("General");
 		mkMenuItem(submn, Name, "About", cmInvokeAbout, "About");
-		mkMenuItem(submn, Name, "Log", cmInvokeLog, "Events log");
+		mkMenuItem(submn, Name, "Log", cmInvokeLog, "Events log", KeyEvent.VK_O, menuShortcutKeyMask);
 		mkMenuItem(submn, Name, "Cfg", cmConfig, "Save default configuration");
-		mkMenuItem(submn, Name, "Quit", cmStop, "Quit");
+		mkMenuItem(submn, Name, "Quit", cmStop, "Quit" /*, KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK*/);
 		mkMenuMenu(mn, submn, flatten);
 	}
 
@@ -293,53 +306,62 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	private void configure() {
 
 		addWindowListener(this);
-
+		
+		menuShortcutKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
 		tx = new EditorWindow(this, "Simple Basic Editor", false);
 		tx.setPeer(cmSyncEditorIn, cmSyncEditorOut, this);
 		dbg = new DebuggerWindow(this, "Simple i8080 Debugger (press F1 for help)", true, new LvovDebugger(lv));
-		if (cfg("ESC_Debug", "yes"))
+		keyboardShortcuts = cfg("KeyboardShortcuts", "yes");
+		if (keyboardShortcuts && (fullScreen || !cfg("Enable_ToolbarMenu", "yes"))) {
 			lv.addKeyListener(this);
-
-		JPanel tb;
-		FlowLayout tbl = new FlowLayout();
-		tbl.setHgap(0);
-		tbl.setVgap(0);
-		tbl.setAlignment(FlowLayout.LEFT);
-
-		tb = new JPanel();
-		tb.setLayout(tbl);
-		mkToolbar("ToolbarTop", tb);
-		if (cfg("Enable_ToolbarTop", "yes"))
-			add(tb, BorderLayout.NORTH);
-
-		tb = new JPanel();
-		tb.setLayout(tbl);
-		mkToolbar("ToolbarBottom", tb);
-		if (cfg("Enable_ToolbarBottom", "yes"))
-			add(tb, BorderLayout.SOUTH);
-
-		if (cfg("Enable_ToolbarMenu", "yes")) {
-			JMenuBar mb = new JMenuBar();
-			mkMenu("ToolbarMenu", mb, false);
-			setJMenuBar(mb);
 		}
-		if (cfg("Enable_ContextMenu", "yes")) {
-			pm = new JPopupMenu("Context");
-			pm.add(new JMenuItem("Focus on the emulator"));
-			boolean flat = cfg("Enable_FlatContextMenu", "yes");
-			if (!flat)
-				pm.addSeparator();
-			mkMenu("ContextMenu", pm, flat);
-			add(pm);
-			lv.addMouseListener(this);
+		
+		if (!fullScreen) {
+			JPanel tb;
+			FlowLayout tbl = new FlowLayout();
+			tbl.setHgap(0);
+			tbl.setVgap(0);
+			tbl.setAlignment(FlowLayout.LEFT);
+	
+			tb = new JPanel();
+			tb.setLayout(tbl);
+			mkToolbar("ToolbarTop", tb);
+			if (cfg("Enable_ToolbarTop", "yes"))
+				add(tb, BorderLayout.NORTH);
+	
+			tb = new JPanel();
+			tb.setLayout(tbl);
+			mkToolbar("ToolbarBottom", tb);
+			if (cfg("Enable_ToolbarBottom", "yes"))
+				add(tb, BorderLayout.SOUTH);
+	
+			if (cfg("Enable_ToolbarMenu", "yes")) {
+				JMenuBar mb = new JMenuBar();
+				mkMenu("ToolbarMenu", mb, false);
+				setJMenuBar(mb);
+			}
+			if (cfg("Enable_ContextMenu", "yes")) {
+				pm = new JPopupMenu("Context");
+				pm.add(new JMenuItem("Focus on the emulator"));
+				boolean flat = cfg("Enable_FlatContextMenu", "yes");
+				if (!flat)
+					pm.addSeparator();
+				mkMenu("ContextMenu", pm, flat);
+				add(pm);
+				lv.addMouseListener(this);
+			}
+
+			JPanel stb = new JPanel(tbl);
+			stb.add(st = new JLabel("Booting..."));
+			add(stb, BorderLayout.SOUTH);
+			
+			setSize(getPreferredSize());
+			Toolkit tk = getToolkit();
+			setLocation((tk.getScreenSize().width - getSize().width) / 2,
+					(tk.getScreenSize().height - getSize().height) / 2);
+			setSize(fly.preferredLayoutSize(this));
 		}
-
-		add(st = new JLabel("Booting..."), BorderLayout.SOUTH);
-
-		setSize(getPreferredSize());
-		Toolkit tk = getToolkit();
-		setLocation((tk.getScreenSize().width - getSize().width) / 2,
-				(tk.getScreenSize().height - getSize().height) / 2);
+		
 		validate();
 	}
 
@@ -358,6 +380,42 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 			perform(cmInvokeDebugger);
+		else if (e.getKeyCode() == KeyEvent.VK_F8 && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmMode);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_L && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmLoad);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_F6 && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmReset);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_P && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmPause);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_C && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmResume);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_I && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmImport);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_B && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmInvokeEditor);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_R && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmRestore);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_E && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmExport);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_D && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmDumpF);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_O && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmInvokeLog);
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_F5 && e.getModifiers() == menuShortcutKeyMask) {
+			perform(cmSnap);
+		}
 	}
 
 	// -----------------------------------------------------------------------------
@@ -454,19 +512,19 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmLoad:
-			fn = Utils.useFileAsURL(this, "Choose .LVT program", "*.lvt");
+			fn = Utils.useFileAsURL(this, "Choose .LVT program", "lvt");
 			if (fn != null)
 				do_load(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmImport:
-			fn = Utils.useFileAsURL(this, "Choose .BAS source", "*.bas");
+			fn = Utils.useFileAsURL(this, "Choose .BAS source", "bas");
 			if (fn != null)
 				do_import(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmExport:
-			fn = Utils.mkFile(this, "Choose destination .BAS source", "*.bas");
+			fn = Utils.mkFile(this, "Choose destination .BAS source", "bas");
 			if (fn != null)
 				do_export(fn);
 			break;
@@ -496,33 +554,33 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmDumpF:
-			fn = Utils.mkFile(this, "Choose destination .LVD file", "*.lvd");
+			fn = Utils.mkFile(this, "Choose destination .LVD file", "lvd");
 			if (fn != null)
 				do_full_dump(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmDumpP:
-			fn = Utils.mkFile(this, "Choose destination .LVD file", "*.lvd");
+			fn = Utils.mkFile(this, "Choose destination .LVD file", "lvd");
 			if (fn != null)
 				do_partial_dump(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmSnap:
 			do_pause();
-			fn = Utils.mkFile(this, "Choose destination image file", "*.png;*.gif;*.jpg;*.bmp");
+			fn = Utils.mkFile(this, "Choose destination image file", "PNG image#png", "GIF image#gif", "JPEG image#jpg", "Bitmap image#bmp");
 			do_resume();
 			if (fn != null)
 				do_snap(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmRestore:
-			fn = Utils.useFileAsURL(this, "Choose source .LVD file", "*.lvd");
+			fn = Utils.useFileAsURL(this, "Choose source .LVD file", "lvd");
 			if (fn != null)
 				do_restore(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmConfig:
-			fn = Utils.mkFile(this, "Choose configuration file", "emulator.cfg");
+			fn = Utils.mkFile(this, "Choose configuration file", "cfg");
 			if (fn != null)
 				do_config_dump(fn);
 			break;
@@ -580,7 +638,6 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 				return;
 			}
 			configure();
-			setSize(fly.preferredLayoutSize(this));
 			setTitle("PK-01 Lvov Emulator");
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		} catch (Exception ex) {
@@ -602,7 +659,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	@Override
 	void showStatus(String status) {
-		st.setText(status);
+		if (!fullScreen) st.setText(status);
 	}
 
 	@Override
