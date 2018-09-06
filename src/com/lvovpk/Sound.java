@@ -15,7 +15,7 @@ public class Sound {
 	// -----------------------------------------------------------------------------
 	public static void init() {
 		try {
-			AudioFormat format = new AudioFormat(44100f, 16, 2, true, true);
+			AudioFormat format = new AudioFormat(44100f, 8, 1, false, false);
 			line = AudioSystem.getSourceDataLine(format);
 			line.open(format);
 		} catch (LineUnavailableException e) {
