@@ -1,5 +1,6 @@
 package com.lvovpk;
 
+import java.awt.event.KeyEvent;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -256,4 +257,18 @@ class PK01 extends PK00 {
 	}
 
 	// -----------------------------------------------------------------------------
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (Keyboard.getCommandForShortcut(e) == 0) {
+			super.keyPressed(e);
+		}
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if (Keyboard.getCommandForShortcut(e) == 0) {
+			super.keyReleased(e);
+		}
+	}
 }

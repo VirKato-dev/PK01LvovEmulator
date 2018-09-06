@@ -1,5 +1,6 @@
 package com.lvovpk;
 
+import java.awt.event.KeyEvent;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -8,7 +9,26 @@ import java.util.Hashtable;
  */
 class Keyboard {
 
+	private static final int[][] shortcuts = {
+		{ KeyEvent.VK_F8,     EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmMode },
+		{ KeyEvent.VK_L,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmLoad },
+		{ KeyEvent.VK_F6,     EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmReset },
+		{ KeyEvent.VK_P,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmPause },
+		{ KeyEvent.VK_C,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmResume },
+		{ KeyEvent.VK_I,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmImport },
+		{ KeyEvent.VK_B,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmInvokeEditor },
+		{ KeyEvent.VK_R,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmRestore },
+		{ KeyEvent.VK_E,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmExport },
+		{ KeyEvent.VK_D,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmDumpF },
+		{ KeyEvent.VK_O,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmInvokeLog },
+		{ KeyEvent.VK_F5,     EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmSnap },
+		{ KeyEvent.VK_ESCAPE, 0,                              EmulatorUI.cmInvokeDebugger }
+	};
+	
+	public static boolean enableShortcuts = false;
+	
 	public static Dictionary<String, Integer> as_int;
+	
 
 	//-----------------------------------------------------------------------------
 	static {
@@ -204,4 +224,26 @@ class Keyboard {
 	}
 
 	//-----------------------------------------------------------------------------
+	
+	public static int getCommandForShortcut(KeyEvent e) {
+		if (enableShortcuts) {
+			for (int i = 0; i < shortcuts.length; i++) {
+				if (shortcuts[i][0] == e.getKeyCode() && shortcuts[i][1] == e.getModifiers()) {
+					return shortcuts[i][2];
+				}
+			}
+		}
+		return 0;
+	}
+	
+	public static int[] getShortcutForCommand(int command) {
+		if (enableShortcuts) {
+			for (int i = 0; i < shortcuts.length; i++) {
+				if (shortcuts[i][2] == command) {
+					return new int[] { shortcuts[i][0], shortcuts[i][1] };
+				}
+			}
+		}
+		return null;
+	}
 }
