@@ -9,7 +9,8 @@ import java.awt.event.KeyListener;
 import java.awt.image.IndexColorModel;
 import java.awt.image.MemoryImageSource;
 import java.io.OutputStream;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * LVOV Software Abstraction
@@ -67,7 +68,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// K e y b o a r d M a n i p u l a t i o n s
 	// a n d S u p p l e m e n t a r y S t u f f
 	// -----------------------------------------------------------------------------
-	private Hashtable<Integer, Integer> keyMask = new Hashtable<Integer, Integer>();
+	private Map<Integer, Integer> keyMask = new ConcurrentHashMap<Integer, Integer>();
 
 	// -----------------------------------------------------------------------------
 	public void clr_kb(int vk) {

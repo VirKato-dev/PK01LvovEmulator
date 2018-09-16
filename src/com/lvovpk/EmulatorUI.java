@@ -1,6 +1,7 @@
 package com.lvovpk;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -15,9 +16,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -25,6 +28,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JToolBar;
 import javax.swing.MenuElement;
 
 /**
@@ -44,6 +48,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	static final int cmInvokeDebugger = 23;
 	static final int cmInvokeAbout = 24;
 	static final int cmInvokeLog = 25;
+	static final int cmChangeTicks = 26;
 	static final int cmVolCtl = 1000;
 	
 	static final int menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -52,7 +57,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	private EditorWindow tx;
 	private DebuggerWindow dbg;
 	private LogWindow log;
-	private JLabel st;
+	private JLabel st = null;
 	
 	private String configFileName = null;
 
@@ -71,13 +76,13 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			o.println("");
 
 			o.println("#OSD Settings");
-			k = Utils.sort(config.keys(), true);
+			k = Utils.sort(config.keySet(), true);
 			for (int i = 0; i < k.length; i++)
 				o.println(Utils.padRight(k[i], 40) + config.get(k[i]).toString());
 			o.println("");
 
 			o.println("#LVOV Settings");
-			k = Utils.sort(Defaults.cfg.keys(), true);
+			k = Utils.sort(Defaults.cfg.keySet(), true);
 			for (int i = 0; i < k.length; i++)
 				o.println(Utils.padRight(k[i], 40) + Defaults.cfg.get(k[i]).toString());
 			o.println("");
@@ -132,9 +137,9 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	}
 
 	// -----------------------------------------------------------------------------
-	private static Dictionary<String, String> config;
+	private static Map<String, String> config;
 	static {
-		config = new Hashtable<String, String>();
+		config = new ConcurrentHashMap<String, String>();
 
 		String Menus[][] = new String[][] {
 			{ "ToolbarTop", "No" },
@@ -146,6 +151,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			{ "Mode", "No", "Yes", "Yes", "Yes" },
 			{ "Fast", "No", "Yes", "Yes", "Yes" },
 			{ "Slow", "No", "Yes", "Yes", "Yes" },
+			{ "Ticks", "No", "Yes", "Yes", "Yes" },
 			{ "Speaker", "Yes", "No", "Yes", "Yes" },
 			{ "Reset", "Yes", "No", "Yes", "Yes" },
 			{ "Pause", "Yes", "No", "Yes", "Yes" },
@@ -164,10 +170,11 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			{ "About", "No", "No", "Yes", "No" },
 			{ "Log", "Yes", "No", "Yes", "Yes" },
 			{ "Cfg", "No", "Yes", "Yes", "Yes" },
-			{ "Quit", "No", "No", "Yes", "No" }
+			{ "Quit", "No", "No", "Yes", "Yes" }
 		};
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		config.put("Enable_Statusbar", "Yes");
 		config.put("Enable_FlatContextMenu", "Yes");
 		for (int i = 0; i < Menus.length; i++) {
 			config.put("Enable_" + Menus[i][0], Menus[i][1]);
@@ -190,15 +197,15 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private void mkButton(JPanel tb, String Name, String Feature, int Command, String Description) {
+	private void mkToolbarButton(JToolBar tb, String Name, String Feature, int Command, String Description) {
 		if (cfg("Enable_" + Name + "_" + Feature + "_Feature", "yes"))
 			tb.add(GuiUtils.createButton(Command, Description, this));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private void mkMenuMenu(MenuElement mc, JMenu mi, boolean flatten) {
-		JMenuBar mb;
 		JMenu mn;
+		JComponent jc;
 		if (mc instanceof JMenu) {
 			mn = (JMenu) mc;
 			if (!flatten) {
@@ -211,43 +218,45 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 				for (int i = 0; i < ii; i++)
 					mn.add(mi.getItem(0));
 			}
-		} else {
-			mb = (JMenuBar) mc;
+		}
+		else if (mc instanceof JComponent) {
+			jc = (JComponent) mc;
 			if (mi.getItemCount() > 0)
-				mb.add(mi);
+				jc.add(mi);
 		}
 	}
 
 	// -----------------------------------------------------------------------------
-	private void mkToolbar(String Name, JPanel tb) {
-		mkButton(tb, Name, "Mode", cmMode, "Mode");
-		mkButton(tb, Name, "Fast", cmFast, "Fast");
-		mkButton(tb, Name, "Slow", cmSlow, "Slow");
-		mkButton(tb, Name, "PRN_O", cmOpenPRN, "oPRN");
-		mkButton(tb, Name, "PRN_C", cmClosePRN, "cPRN");
+	private void mkToolbar(String Name, JToolBar tb) {
+		mkToolbarButton(tb, Name, "Mode", cmMode, "Mode");
+		mkToolbarButton(tb, Name, "Ticks", cmChangeTicks, "Ticks");
+		mkToolbarButton(tb, Name, "Fast", cmFast, "Fast");
+		mkToolbarButton(tb, Name, "Slow", cmSlow, "Slow");
+		mkToolbarButton(tb, Name, "PRN_O", cmOpenPRN, "oPRN");
+		mkToolbarButton(tb, Name, "PRN_C", cmClosePRN, "cPRN");
 
-		mkButton(tb, Name, "Speaker", cmVolCtl + 0, "Mute");
-		mkButton(tb, Name, "Speaker", cmVolCtl + 100, "Loud");
+		mkToolbarButton(tb, Name, "Speaker", cmVolCtl + 0, "Mute");
+		mkToolbarButton(tb, Name, "Speaker", cmVolCtl + 100, "Loud");
 
-		mkButton(tb, Name, "Reset", cmReset, "Reset");
-		mkButton(tb, Name, "Pause", cmPause, "Pause");
-		mkButton(tb, Name, "Resume", cmResume, "Resume");
-		mkButton(tb, Name, "Debug", cmInvokeDebugger, "Debug");
+		mkToolbarButton(tb, Name, "Reset", cmReset, "Reset");
+		mkToolbarButton(tb, Name, "Pause", cmPause, "Pause");
+		mkToolbarButton(tb, Name, "Resume", cmResume, "Resume");
+		mkToolbarButton(tb, Name, "Debug", cmInvokeDebugger, "Debug");
 
-		mkButton(tb, Name, "Load", cmLoad, "Load");
-		mkButton(tb, Name, "Import", cmImport, "Import");
-		mkButton(tb, Name, "Edit", cmInvokeEditor, "Edit");
-		mkButton(tb, Name, "Restore", cmRestore, "Restore");
+		mkToolbarButton(tb, Name, "Load", cmLoad, "Load");
+		mkToolbarButton(tb, Name, "Import", cmImport, "Import");
+		mkToolbarButton(tb, Name, "Edit", cmInvokeEditor, "Edit");
+		mkToolbarButton(tb, Name, "Restore", cmRestore, "Restore");
 
-		mkButton(tb, Name, "Export", cmExport, "Export");
-		mkButton(tb, Name, "DumpF", cmDumpF, "Full");
-		mkButton(tb, Name, "DumpP", cmDumpP, "Partial");
-		mkButton(tb, Name, "Snap", cmSnap, "Snap");
+		mkToolbarButton(tb, Name, "Export", cmExport, "Export");
+		mkToolbarButton(tb, Name, "DumpF", cmDumpF, "Full");
+		mkToolbarButton(tb, Name, "DumpP", cmDumpP, "Partial");
+		mkToolbarButton(tb, Name, "Snap", cmSnap, "Snap");
 
-		mkButton(tb, Name, "About", cmInvokeAbout, "About");
-		mkButton(tb, Name, "Log", cmInvokeLog, "Log");
-		mkButton(tb, Name, "Cfg", cmConfig, "Conf");
-		mkButton(tb, Name, "Quit", cmStop, "Quit");
+		mkToolbarButton(tb, Name, "About", cmInvokeAbout, "About");
+		mkToolbarButton(tb, Name, "Log", cmInvokeLog, "Log");
+		mkToolbarButton(tb, Name, "Cfg", cmConfig, "Conf");
+		mkToolbarButton(tb, Name, "Quit", cmStop, "Quit");
 	}
 
 	// -----------------------------------------------------------------------------
@@ -256,6 +265,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 		submn = new JMenu("Config");
 		mkMenuItem(submn, Name, "Mode", cmMode, "Change rendering mode");
+		mkMenuItem(submn, Name, "Ticks", cmChangeTicks, "Change CPU Clock Ticks");
 		mkMenuItem(submn, Name, "Fast", cmFast, "Emulate at full speed");
 		mkMenuItem(submn, Name, "Slow", cmSlow, "Emulate at real speed");
 		mkMenuItem(submn, Name, "PRN_O", cmOpenPRN, "Open printer");
@@ -311,49 +321,68 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		}
 		
 		if (!fullScreen) {
-			JPanel tb;
+			JToolBar tb;
 			FlowLayout tbl = new FlowLayout();
 			tbl.setHgap(0);
 			tbl.setVgap(0);
 			tbl.setAlignment(FlowLayout.LEFT);
-	
-			tb = new JPanel();
-			tb.setLayout(tbl);
-			mkToolbar("ToolbarTop", tb);
-			if (cfg("Enable_ToolbarTop", "yes"))
-				add(tb, BorderLayout.NORTH);
-	
-			tb = new JPanel();
-			tb.setLayout(tbl);
-			mkToolbar("ToolbarBottom", tb);
-			if (cfg("Enable_ToolbarBottom", "yes"))
-				add(tb, BorderLayout.SOUTH);
-	
+			
+			if (cfg("Enable_ToolbarTop", "yes")) {
+				JPanel topPanel = new JPanel();
+				topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+				tb = new JToolBar();
+				tb.setFloatable(false);
+				tb.setLayout(tbl);
+				tb.setAlignmentX(Component.LEFT_ALIGNMENT);
+				mkToolbar("ToolbarTop", tb);
+				topPanel.add(tb);
+				add(topPanel, BorderLayout.NORTH);
+			}
+			
+			if (cfg("Enable_Statusbar", "yes") || cfg("Enable_ToolbarBottom", "yes")) {
+				JPanel bottomPanel = new JPanel();
+				bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+				
+				if (cfg("Enable_ToolbarBottom", "yes")) {
+					tb = new JToolBar();
+					tb.setFloatable(false);
+					tb.setLayout(tbl);
+					tb.setAlignmentX(Component.LEFT_ALIGNMENT);
+					mkToolbar("ToolbarBottom", tb);
+					bottomPanel.add(tb);
+				}
+				
+				if (cfg("Enable_Statusbar", "yes")) {
+					JPanel stb = new JPanel(tbl);
+					stb.add(st = new JLabel("Booting..."));
+					stb.setAlignmentX(Component.LEFT_ALIGNMENT);
+					bottomPanel.add(stb);
+				}
+				add(bottomPanel, BorderLayout.SOUTH);
+			}
+			
 			if (cfg("Enable_ToolbarMenu", "yes")) {
 				JMenuBar mb = new JMenuBar();
 				mkMenu("ToolbarMenu", mb, false);
 				setJMenuBar(mb);
 			}
-			if (cfg("Enable_ContextMenu", "yes")) {
-				pm = new JPopupMenu("Context");
-				pm.add(new JMenuItem("Focus on the emulator"));
-				boolean flat = cfg("Enable_FlatContextMenu", "yes");
-				if (!flat)
-					pm.addSeparator();
-				mkMenu("ContextMenu", pm, flat);
-				add(pm);
-				lv.addMouseListener(this);
-			}
-
-			JPanel stb = new JPanel(tbl);
-			stb.add(st = new JLabel("Booting..."));
-			add(stb, BorderLayout.SOUTH);
 			
 			setSize(getPreferredSize());
 			Toolkit tk = getToolkit();
 			setLocation((tk.getScreenSize().width - getSize().width) / 2,
 					(tk.getScreenSize().height - getSize().height) / 2);
 			setSize(fly.preferredLayoutSize(this));
+		}
+		
+		if (cfg("Enable_ContextMenu", "yes")) {
+			pm = new JPopupMenu("Context");
+			pm.add(new JMenuItem("Focus on the emulator"));
+			boolean flat = cfg("Enable_FlatContextMenu", "yes");
+			if (!flat)
+				pm.addSeparator();
+			mkMenu("ContextMenu", pm, flat);
+			//add(pm);
+			lv.addMouseListener(this);
 		}
 		
 		validate();
@@ -447,11 +476,6 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		switch (cmd) {
-		default:
-			if (cmd >= cmVolCtl && cmd <= cmVolCtl + 100)
-				do_volume(cmd - cmVolCtl);
-			break;
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmFast:
 			do_fast();
 			break;
@@ -460,6 +484,11 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		case cmMode:
 			do_cmode();
+			break;
+		case cmChangeTicks:
+			do_pause();
+			showChangeTicksDialog();
+			do_resume();
 			break;
 		case cmReset:
 			do_reset();
@@ -558,11 +587,35 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			ireq = cmStop;
 			dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 			break;
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		default:
+			if (cmd >= cmVolCtl && cmd <= cmVolCtl + 100)
+				do_volume(cmd - cmVolCtl);
+			break;
 		}
 	}
 
 	public void setConfigFileName(String configFileName) {
 		this.configFileName = configFileName;
+	}
+
+	private void showChangeTicksDialog() {
+		String ticksInput = JOptionPane.showInputDialog(this, "New value for CPU Clock Ticks:", ticks);
+		if (ticksInput != null) {
+			try {
+				int ticksNewValue = Integer.parseInt(ticksInput.trim());
+				if (ticksNewValue > 0 && ticksNewValue <= 1000000) {
+					ticks = ticksNewValue;
+					writeLog("CPU Clock Ticks value set to " + ticks);
+				}
+				else {
+					writeLog("Invalid value for CPU Clock Ticks: \"" + ticksNewValue + "\". Must be between 1 - 1000000");
+				}
+			}
+			catch (Exception e) {
+				writeLog("Invalid value for CPU Clock Ticks: \"" + ticksInput + "\". " + e.getClass().getSimpleName());
+			}
+		}
 	}
 
 	private void showAboutDialog() {
@@ -619,7 +672,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	@Override
 	void showStatus(String status) {
-		if (!fullScreen) st.setText(status);
+		if (st != null) st.setText(status);
 	}
 
 	@Override

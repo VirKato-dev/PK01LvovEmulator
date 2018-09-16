@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.JFrame;
@@ -31,6 +31,7 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 	int ireq;
 	boolean go_fast, go_sound, speak_slow, fullScreen;
 	int speak_mode;
+	int ticks;
 	byte volume_up = 127, volume_down = 127;
 	Thread framer;
 	LayoutManager fly;
@@ -122,7 +123,7 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 			start_cycle = System.currentTimeMillis();
 			lv.update_image();
 			frames++;
-			lv.emulate(Integer.parseInt(cfg("CpuTicks")));
+			lv.emulate(ticks);
 			stop_cycle = System.currentTimeMillis();
 			wait_cycle = (int) (stop_cycle - start_cycle);
 
@@ -236,6 +237,7 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			mode = Integer.parseInt(cfg("Mode"));
+			ticks = Integer.parseInt(cfg("CpuTicks"));
 			
 			lv = new PK01(mode);
 			go_fast = !cfg("Sync", "yes");
@@ -292,9 +294,8 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 				lv.cold_start();
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			Enumeration<?> e = Keyboard.as_int.keys();
-			while (e.hasMoreElements()) {
-				String n = (String) e.nextElement();
+			Set<String> e = Keyboard.as_int.keySet();
+			for (String n : e) {
 				Integer vk = (Integer) Keyboard.as_int.get(n);
 				String s = cfg(n);
 				if (!s.equals("")) {

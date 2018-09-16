@@ -6,7 +6,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.util.Set;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -23,27 +23,24 @@ public class Utils {
 	// -----------------------------------------------------------------------------
 	// S o r t i n g
 	// -----------------------------------------------------------------------------
-	public static String[] sort(Enumeration<?> e, boolean ascend) {
+	public static String[] sort(Set<String> e, boolean ascend) {
 		Vector<String> vct = new Vector<String>();
 		int i;
 
-		while (e.hasMoreElements()) {
-			String key = e.nextElement().toString(); // sort in ascending order
+		for (String key : e) { // sort in ascending order
 			for (i = 0; i < vct.size(); i++)
 				if (key.compareTo(vct.elementAt(i).toString()) < 0)
 					break;
 			vct.insertElementAt(key, i);
 		}
 
-		String Result[] = new String[vct.size()]; // then prepare data for
-													// client
+		String Result[] = new String[vct.size()]; // then prepare data for client
 
 		if (ascend)
 			for (i = 0; i < vct.size(); i++) // ok, leave intact
 				Result[i] = vct.elementAt(i).toString();
 		else
-			for (i = 0; i < vct.size(); i++) // hmm, needs to reverse order of
-												// data
+			for (i = 0; i < vct.size(); i++) // hmm, needs to reverse order of data
 				Result[vct.size() - i - 1] = vct.elementAt(i).toString();
 
 		return Result;

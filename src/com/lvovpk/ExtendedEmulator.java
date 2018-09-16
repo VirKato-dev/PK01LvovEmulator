@@ -371,8 +371,7 @@ public class ExtendedEmulator extends PrimitiveEmulator {
 			super.run();
 			switch (ireq) {
 			default:
-				if (lv.pk.cpu_halt_state && ireq == 0) // what's the matter of
-														// halt ?
+				if (lv.pk.cpu_halt_state && ireq == 0) // what's the matter of halt ?
 				{
 					if (lv.pk.cpu_halt_reason == Lvov.halt_bpx) // bpx on load ?
 					{

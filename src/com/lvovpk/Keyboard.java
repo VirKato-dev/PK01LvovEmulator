@@ -1,8 +1,8 @@
 package com.lvovpk;
 
 import java.awt.event.KeyEvent;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Keyboard Abstraction layer
@@ -22,17 +22,18 @@ class Keyboard {
 		{ KeyEvent.VK_D,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmDumpF },
 		{ KeyEvent.VK_O,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmInvokeLog },
 		{ KeyEvent.VK_F5,     EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmSnap },
+		{ KeyEvent.VK_T,      EmulatorUI.menuShortcutKeyMask, EmulatorUI.cmChangeTicks },
 		{ KeyEvent.VK_ESCAPE, 0,                              EmulatorUI.cmInvokeDebugger }
 	};
 	
 	public static boolean enableShortcuts = false;
 	
-	public static Dictionary<String, Integer> as_int;
+	public static Map<String, Integer> as_int;
 	
 
 	//-----------------------------------------------------------------------------
 	static {
-	    as_int = new Hashtable<String, Integer>();
+	    as_int = new ConcurrentHashMap<String, Integer>();
 	    as_int.put("VK_ENTER",                     new Integer(    '\n'));
 	    as_int.put("VK_BACK_SPACE",                new Integer(    '\b'));
 	    as_int.put("VK_TAB",                       new Integer(    '\t'));

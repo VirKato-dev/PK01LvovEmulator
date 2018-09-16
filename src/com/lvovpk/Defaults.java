@@ -1,18 +1,18 @@
 package com.lvovpk;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Emulator defaults
  */
 class Defaults {
 
-	static Dictionary<String, String> cfg;
+	static Map<String, String> cfg;
 
 	// -----------------------------------------------------------------------------
 	static {
-		cfg = new Hashtable<String, String>();
+		cfg = new ConcurrentHashMap<String, String>();
 
 		cfg.put("BiosFile", "bios.gz");
 		cfg.put("DumpFile", "boot.lvd");
