@@ -3,6 +3,7 @@ package com.lvovpk;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -224,8 +225,8 @@ public class Utils {
 	}
 
 	// -----------------------------------------------------------------------------
-	public static String useFileAsURL(JFrame wnd, String title, String... masks) {
-		JFileChooser dlg = new JFileChooser();
+	public static File openFileDialog(JFrame wnd, String currentDir, String title, String... masks) {
+		JFileChooser dlg = new JFileChooser(currentDir);
 		dlg.setDialogTitle(title);
 		dlg.setAcceptAllFileFilterUsed(false);
 		for (String mask : masks) {
@@ -237,13 +238,13 @@ public class Utils {
 
 		int returnValue = dlg.showOpenDialog(wnd);
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			return dlg.getSelectedFile().getPath();
+			return dlg.getSelectedFile();
 		}
 		return null;
 	}
 
-	public static String mkFile(JFrame wnd, String title, String... masks) {
-		JFileChooser dlg = new JFileChooser();
+	public static File saveFileDialog(JFrame wnd, String currentDir, String title, String... masks) {
+		JFileChooser dlg = new JFileChooser(currentDir);
 		dlg.setDialogTitle(title);
 		dlg.setAcceptAllFileFilterUsed(false);
 		for (String mask : masks) {
@@ -259,10 +260,10 @@ public class Utils {
 			String[] extensions = ((FileNameExtensionFilter)dlg.getFileFilter()).getExtensions();
 			for (String extension : extensions) {
 				if (getFileExtension(filePath).equalsIgnoreCase(extension)) {
-					return filePath;
+					return dlg.getSelectedFile();
 				}
 			}
-			return dlg.getSelectedFile().getPath() + "." + extensions[0];
+			return new File(dlg.getSelectedFile().getAbsolutePath() + "." + extensions[0]);
 		}
 		return null;
 	}

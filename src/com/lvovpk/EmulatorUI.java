@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.ImageProducer;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -40,7 +41,6 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	 * 
 	 */
 	private static final long serialVersionUID = 46689693694740808L;
-	// these are highly internal fellows...
 	static final int cmConfig = 19;
 	static final int cmInvokeEditor = 20;
 	static final int cmSyncEditorIn = 21;
@@ -60,6 +60,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	private JLabel st = null;
 	
 	private String configFileName = null;
+	private String currentDir = null;
 
 	public final void do_config_dump(String Name) {
 		config_dump(Name);
@@ -501,19 +502,19 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmLoad:
-			fn = Utils.useFileAsURL(this, "Choose .LVT program", "lvt");
+			fn = showFileDialog(false, "Choose .LVT program", "lvt");
 			if (fn != null)
 				do_load(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmImport:
-			fn = Utils.useFileAsURL(this, "Choose .BAS source", "bas");
+			fn = showFileDialog(false, "Choose .BAS source", "bas");
 			if (fn != null)
 				do_import(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmExport:
-			fn = Utils.mkFile(this, "Choose destination .BAS source", "bas");
+			fn = showFileDialog(true, "Choose destination .BAS source", "bas");
 			if (fn != null)
 				do_export(fn);
 			break;
@@ -543,39 +544,39 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmDumpF:
-			fn = Utils.mkFile(this, "Choose destination .LVD file", "lvd");
+			fn = showFileDialog(true, "Choose destination .LVD file", "lvd");
 			if (fn != null)
 				do_full_dump(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmDumpP:
-			fn = Utils.mkFile(this, "Choose destination .LVD file", "lvd");
+			fn = showFileDialog(true, "Choose destination .LVD file", "lvd");
 			if (fn != null)
 				do_partial_dump(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmSnap:
 			do_pause();
-			fn = Utils.mkFile(this, "Choose destination image file", "PNG image#png", "GIF image#gif", "JPEG image#jpg", "Bitmap image#bmp");
+			fn = showFileDialog(true, "Choose destination image file", "PNG image#png", "GIF image#gif", "JPEG image#jpg", "Bitmap image#bmp");
 			do_resume();
 			if (fn != null)
 				do_snap(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmRestore:
-			fn = Utils.useFileAsURL(this, "Choose source .LVD file", "lvd");
+			fn = showFileDialog(false, "Choose source .LVD file", "lvd");
 			if (fn != null)
 				do_restore(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmConfig:
-			fn = Utils.mkFile(this, "Choose configuration file", "cfg");
+			fn = showFileDialog(true, "Choose configuration file", "cfg");
 			if (fn != null)
 				do_config_dump(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case cmOpenPRN:
-			fn = Utils.mkFile(this, "Choose device to print to", "print");
+			fn = showFileDialog(true, "Choose device to print to", "print");
 			if (fn != null)
 				do_open_prn(fn);
 			break;
@@ -624,6 +625,17 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n" + "(c) 2018 by Izhak Serovsky \n\n"
 						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
 						+ "The emulator is distributed under the GNU General Public License version 2");
+	}
+	
+	private String showFileDialog(boolean saveFile, String title, String... masks) {
+		File selectedFile = (saveFile ?
+				Utils.saveFileDialog(this, currentDir, title, masks) :
+					Utils.openFileDialog(this, currentDir, title, masks));
+		if (selectedFile != null) {
+			currentDir = selectedFile.getParent();
+			return selectedFile.getAbsolutePath();
+		}
+		return null;
 	}
 
 	// -----------------------------------------------------------------------------

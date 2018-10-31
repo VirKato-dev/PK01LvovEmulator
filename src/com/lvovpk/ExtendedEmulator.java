@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 /**
  * Extended Lvov Emulator
  */
-public class ExtendedEmulator extends PrimitiveEmulator {
+public abstract class ExtendedEmulator extends PrimitiveEmulator {
 
 	/**
 	 * 
@@ -29,9 +29,7 @@ public class ExtendedEmulator extends PrimitiveEmulator {
 	// -----------------------------------------------------------------------------
 	// U t i l i t y
 	// -----------------------------------------------------------------------------
-	void writeLog(String msg) {
-		System.out.println(msg);
-	}
+	abstract void writeLog(String msg);
 
 	// -----------------------------------------------------------------------------
 	// I n t e r f a c e

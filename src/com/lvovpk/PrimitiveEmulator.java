@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 /**
  * Primitive Lvov Emulator
  */
-public class PrimitiveEmulator extends JFrame implements Runnable {
+public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 
 	/**
 	 * 
@@ -333,8 +333,6 @@ public class PrimitiveEmulator extends JFrame implements Runnable {
 		close_printer();
 	}
 
-	void showStatus(String status) {
-		System.out.println(status);
-	}
+	abstract void showStatus(String status);
 	// -----------------------------------------------------------------------------
 }
