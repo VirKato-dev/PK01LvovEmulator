@@ -23,7 +23,26 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	 * 
 	 */
 	private static final long serialVersionUID = -4020586722385270698L;
-	String ireq2, Overlay;
+	static final int CM_MODE = 1;
+	static final int CM_RESET = 2;
+	static final int CM_DUMP_F = 3;
+	static final int CM_DUMP_P = 4;
+	static final int CM_COPY = 5;
+	static final int CM_EXPORT = 6;
+	static final int CM_RESTORE = 7;
+	static final int CM_LOAD = 8;
+	static final int CM_IMPORT = 9;
+	static final int CM_PASTE = 10;
+	static final int CM_FAST = 11;
+	static final int CM_SLOW = 12;
+	static final int CM_PAUSE = 13;
+	static final int CM_RESUME = 14;
+	static final int CM_SNAP = 15;
+	static final int CM_OPEN_PRN = 16;
+	static final int CM_CLOSE_PRN = 17;
+	static final int CM_VOLUME = 18;
+
+	String ireq2, overlay;
 	int ireq3;
 
 	// -----------------------------------------------------------------------------
@@ -34,124 +53,88 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	// -----------------------------------------------------------------------------
 	// I n t e r f a c e
 	// -----------------------------------------------------------------------------
-	static final int cmMode = 1;
-
-	public final void do_cmode() {
-		ireq = cmMode;
+	public final void doChangeMode() {
+		ireq = CM_MODE;
 	} // change rendering mode
 
-	static final int cmReset = 2;
-
-	public final void do_reset() {
-		ireq = cmReset;
+	public final void doReset() {
+		ireq = CM_RESET;
 	} // perform cold_start
 
-	static final int cmDumpF = 3;
-
-	public final void do_full_dump(String Name) {
-		ireq2 = Name;
-		ireq = cmDumpF;
+	public final void doFullDump(String name) {
+		ireq2 = name;
+		ireq = CM_DUMP_F;
 	} // do full dump of computer state
 
-	static final int cmDumpP = 4;
-
-	public final void do_partial_dump(String Name) {
-		ireq2 = Name;
-		ireq = cmDumpP;
+	public final void doPartialDump(String name) {
+		ireq2 = name;
+		ireq = CM_DUMP_P;
 	} // do partial dump of computer state
 
-	static final int cmCopy = 5;
-
-	public final String do_copy() // !!! SYNC !!!
+	public final String doCopy() // !!! SYNC !!!
 	{
 		return copy();
 	} // return basic program as text
 
-	static final int cmExport = 6;
-
-	public final void do_export(String Name) {
-		ireq2 = Name;
-		ireq = cmExport;
+	public final void doExport(String name) {
+		ireq2 = name;
+		ireq = CM_EXPORT;
 	} // export basic program as text
 
-	static final int cmRestore = 7;
-
-	public final void do_restore(String Name) {
-		ireq2 = Name;
-		ireq = cmRestore;
+	public final void doRestore(String name) {
+		ireq2 = name;
+		ireq = CM_RESTORE;
 	} // restore computer state from dump
 
-	static final int cmLoad = 8;
-
-	public final void do_load(String Name) {
-		ireq2 = Overlay = Name;
-		ireq = cmLoad;
+	public final void doLoad(String name) {
+		ireq2 = overlay = name;
+		ireq = CM_LOAD;
 	} // load program and launch it
 
-	static final int cmImport = 9;
-
-	public final void do_import(String Name) {
-		ireq2 = Overlay = Name;
-		ireq = cmImport;
+	public final void doImport(String name) {
+		ireq2 = overlay = name;
+		ireq = CM_IMPORT;
 	} // import program and launch it
 
-	static final int cmPaste = 10;
-
-	public final void do_paste(String Body) {
-		Overlay = "";
-		ireq2 = Body;
-		ireq = cmPaste;
+	public final void doPaste(String body) {
+		overlay = "";
+		ireq2 = body;
+		ireq = CM_PASTE;
 	} // import program from argument
 
-	static final int cmFast = 11;
-
-	public final void do_fast() {
-		ireq = cmFast;
+	public final void doFast() {
+		ireq = CM_FAST;
 	} // emulate at full speed
 
-	static final int cmSlow = 12;
-
-	public final void do_slow() {
-		ireq = cmSlow;
+	public final void doSlow() {
+		ireq = CM_SLOW;
 	} // emulate synchronizing with timer
 
-	static final int cmPause = 13;
-
-	public final void do_pause() {
-		ireq = cmPause;
+	public final void doPause() {
+		ireq = CM_PAUSE;
 	} // pause execution
 
-	static final int cmResume = 14;
-
-	public final void do_resume() {
-		ireq = cmResume;
+	public final void doResume() {
+		ireq = CM_RESUME;
 	} // resume execution
 
-	static final int cmSnap = 15;
-
-	public final void do_snap(String Name) {
-		ireq2 = Name;
-		ireq = cmSnap;
+	public final void doSnap(String name) {
+		ireq2 = name;
+		ireq = CM_SNAP;
 	} // make screen snapshot
 
-	static final int cmOpenPRN = 16;
-
-	public final void do_open_prn(String Name) {
-		ireq2 = Name;
-		ireq = cmOpenPRN;
+	public final void doOpenPrn(String name) {
+		ireq2 = name;
+		ireq = CM_OPEN_PRN;
 	} // open printer device
 
-	static final int cmClosePRN = 17;
-
-	public final void do_close_prn() {
-		ireq = cmClosePRN;
+	public final void doClosePrn() {
+		ireq = CM_CLOSE_PRN;
 	} // close printer device
 
-	static final int cmVolume = 18;
-
-	public final void do_volume(int Loud) {
-		ireq3 = Loud;
-		ireq = cmVolume;
+	public final void doVolume(int loud) {
+		ireq3 = loud;
+		ireq = CM_VOLUME;
 	} // set sound volume
 
 	// -----------------------------------------------------------------------------
@@ -160,9 +143,9 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	boolean dump(String name, boolean full) {
 		writeLog("Dumping " + (full ? "full" : "partial") + " state...");
 		try {
-			OutputStream Dump = Utils.ZIP(name, new FileOutputStream(name));
-			lv.dump(Dump, full);
-			Dump.close();
+			OutputStream dump = Utils.ZIP(name, new FileOutputStream(name));
+			lv.dump(dump, full);
+			dump.close();
 			return true;
 		} catch (Exception ex) {
 			writeLog("Unable to dump state: " + ex);
@@ -174,9 +157,9 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	boolean restore(String name) {
 		writeLog("Restoring state...");
 		try {
-			InputStream Dump = new FileInputStream(name);
-			lv.restore(Utils.ZIP(name, Dump));
-			Dump.close();
+			InputStream dump = new FileInputStream(name);
+			lv.restore(Utils.ZIP(name, dump));
+			dump.close();
 			return true;
 		} catch (Exception ex) {
 			writeLog("Unable to restore state: " + ex);
@@ -193,7 +176,7 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 		writeLog("Loading Program...");
 		try {
 			InputStream prog = new FileInputStream(name);
-			lv.load_prog(Utils.ZIP(name, prog), as);
+			lv.loadProg(Utils.ZIP(name, prog), as);
 			prog.close();
 			return true;
 		} catch (Exception ex) {
@@ -203,7 +186,7 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	}
 
 	// -----------------------------------------------------------------------------
-	private String new_overlay(String name) {
+	private String newOverlay(String name) {
 		int at = name.lastIndexOf(".lv"); // finding extension
 		if (at == -1)
 			return name + ".next"; // no one, exiting...
@@ -228,13 +211,12 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	}
 
 	// -----------------------------------------------------------------------------
-	boolean load_as_text(String name) {
+	boolean loadAsText(String name) {
 		writeLog("Importing Program...");
 		try {
 			InputStreamReader src = new InputStreamReader(Utils.ZIP(name, new FileInputStream(name)));
 			StringBuffer sb = new StringBuffer();
-			for (int ch; (ch = src.read()) >= 0; sb.append((char) ch))
-				;
+			for (int ch; (ch = src.read()) >= 0; sb.append((char) ch));
 			src.close();
 			return paste(sb.toString());
 		} catch (Exception ex) {
@@ -247,8 +229,8 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	boolean paste(String body) {
 		writeLog("Pasting Program...");
 		try {
-			InputStream is = new ByteArrayInputStream(PKIO.text2basic(body, PKIO.cp_default));
-			lv.load_prog(is, true);
+			InputStream is = new ByteArrayInputStream(PKIO.text2basic(body, PKIO.CP_DEFAULT));
+			lv.loadProg(is, true);
 			is.close();
 			return true;
 		} catch (Exception ex) {
@@ -258,7 +240,7 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	}
 
 	// -----------------------------------------------------------------------------
-	boolean save_as_text(String name) {
+	boolean saveAsText(String name) {
 		writeLog("Exporting Program...");
 		try {
 			PrintWriter dst = new PrintWriter(Utils.ZIP(name, new FileOutputStream(name)));
@@ -277,16 +259,16 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 		return copy("AUTO");
 	}
 
-	String copy(String Name) {
+	String copy(String name) {
 		writeLog("Copying Program...");
 		try {
 			ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-			lv.save_prog(tmp, Name);
+			lv.saveProg(tmp, name);
 
 			ByteArrayInputStream is = new ByteArrayInputStream(tmp.toByteArray());
 			tmp.close();
 
-			String result = PKIO.basic2text(is, PKIO.cp_default).toString();
+			String result = PKIO.basic2text(is, PKIO.CP_DEFAULT).toString();
 
 			is.close();
 			return result;
@@ -329,9 +311,9 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 
 	// -----------------------------------------------------------------------------
 	@Override
-	boolean open_printer(String name) {
+	boolean openPrinter(String name) {
 		writeLog("Opening printer...");
-		if (super.open_printer(name)) {
+		if (super.openPrinter(name)) {
 			return true;
 		} else {
 			writeLog("Unable to open printer!");
@@ -341,9 +323,9 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 
 	// -----------------------------------------------------------------------------
 	@Override
-	boolean close_printer() {
+	boolean closePrinter() {
 		writeLog("Closing printer...");
-		if (super.close_printer()) {
+		if (super.closePrinter()) {
 			return true;
 		} else {
 			writeLog("Unable to close printer!");
@@ -353,10 +335,10 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 
 	// -----------------------------------------------------------------------------
 	@Override
-	void print_this(byte[] buffer) {
+	void printThis(byte[] buffer) {
 		if (printerDevice != null && buffer != null) {
 			writeLog("Printing...");
-			super.print_this(buffer);
+			super.printThis(buffer);
 		}
 	}
 
@@ -369,93 +351,93 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 			super.run();
 			switch (ireq) {
 			default:
-				if (lv.pk.cpu_halt_state && ireq == 0) // what's the matter of halt ?
+				if (lv.pk.cpuHaltState && ireq == 0) // what's the matter of halt ?
 				{
-					if (lv.pk.cpu_halt_reason == Lvov.halt_bpx) // bpx on load ?
+					if (lv.pk.cpuHaltReason == Lvov.HALT_BPX) // bpx on load ?
 					{
-						if (!load(Overlay = new_overlay(Overlay), false))
-							do_pause();
+						if (!load(overlay = newOverlay(overlay), false))
+							doPause();
 						else {
 							lv.pk.simuret();
-							lv.pk.cpu_halt_state = false;
+							lv.pk.cpuHaltState = false;
 						}
 					} else // unknown, say to user that we're halted :-Q
 					{
-						writeLog("CPU halted at " + Utils.HEX(lv.pk.r_PC) + " // Reason: " + lv.pk.cpu_halt_reason);
-						do_pause();
+						writeLog("CPU halted at " + Utils.HEX(lv.pk.rPC) + " // Reason: " + lv.pk.cpuHaltReason);
+						doPause();
 					}
 					break;
 				}
 				return;
-			case cmMode:
-				if (mode < PK00.mode_last)
+			case CM_MODE:
+				if (mode < PK00.MODE_LAST)
 					mode++;
 				else
-					mode = PK00.mode_first;
-				ireq = cmRepaint;
+					mode = PK00.MODE_FIRST;
+				ireq = CM_REPAINT;
 				break;
-			case cmReset:
+			case CM_RESET:
 				writeLog("System reset!");
-				lv.cold_start();
+				lv.coldStart();
 				ireq = 0;
 				break;
-			case cmLoad:
+			case CM_LOAD:
 				load(ireq2);
 				ireq = 0;
 				break;
-			case cmImport:
-				load_as_text(ireq2);
+			case CM_IMPORT:
+				loadAsText(ireq2);
 				ireq = 0;
 				break;
-			case cmExport:
-				save_as_text(ireq2);
+			case CM_EXPORT:
+				saveAsText(ireq2);
 				ireq = 0;
 				break;
-			case cmPaste:
+			case CM_PASTE:
 				paste(ireq2);
 				ireq = 0;
 				break;
-			case cmDumpF:
+			case CM_DUMP_F:
 				dump(ireq2, true);
 				ireq = 0;
 				break;
-			case cmDumpP:
+			case CM_DUMP_P:
 				dump(ireq2, false);
 				ireq = 0;
 				break;
-			case cmRestore:
+			case CM_RESTORE:
 				restore(ireq2);
 				ireq = 0;
 				break;
-			case cmSnap:
+			case CM_SNAP:
 				snap(ireq2);
 				ireq = 0;
 				break;
-			case cmFast:
-				go_fast = true;
+			case CM_FAST:
+				goFast = true;
 				ireq = 0;
 				break;
-			case cmSlow:
-				go_fast = false;
+			case CM_SLOW:
+				goFast = false;
 				ireq = 0;
 				break;
-			case cmOpenPRN:
-				open_printer(ireq2);
+			case CM_OPEN_PRN:
+				openPrinter(ireq2);
 				ireq = 0;
 				break;
-			case cmClosePRN:
-				close_printer();
+			case CM_CLOSE_PRN:
+				closePrinter();
 				ireq = 0;
 				break;
-			case cmVolume:
-				set_volume(ireq3);
+			case CM_VOLUME:
+				setVolume(ireq3);
 				ireq = 0;
 				break;
-			case cmResume:
+			case CM_RESUME:
 				ireq = 0;
 				break;
-			case cmPause:
-				while (ireq == cmPause)
+			case CM_PAUSE:
+				while (ireq == CM_PAUSE)
 					try {
 						Thread.sleep(1000);
 					} catch (Exception Ex) {
@@ -469,8 +451,8 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	@Override
 	public void init() {
 		super.init();
-		if (init_failed == null)
-			lv.pk.bpx = Bios.LoadBinaryBpx;
+		if (initFailed == null)
+			lv.pk.bpx = Bios.LOAD_BINARY_BPX;
 	}
 
 	// -----------------------------------------------------------------------------

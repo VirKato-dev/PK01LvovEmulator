@@ -21,8 +21,8 @@ abstract class PK00 extends Canvas implements KeyListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -5674032851714416043L;
-	final static int mode_first = 1;
-	final static int mode_last = 11;
+	final static int MODE_FIRST = 1;
+	final static int MODE_LAST = 11;
 
 	private int scaleX = 1;
 	private int scaleY = 1;
@@ -34,13 +34,13 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// C o m p o n e n t I m p l e m e n t a t i o n
 	// -----------------------------------------------------------------------------
 	PK00() {
-		this(mode_first);
+		this(MODE_FIRST);
 	}
 
 	PK00(int mode) {
 		super();
 		pk = new Lvov();
-		render_as(mode);
+		renderAs(mode);
 		addKeyListener(this);
 	}
 
@@ -58,10 +58,10 @@ abstract class PK00 extends Canvas implements KeyListener {
 
 	@Override
 	public void paint(Graphics g) {
-		if (v_img == null)
+		if (vImg == null)
 			super.paint(g);
 		else
-			g.drawImage(v_img, 0, 0, this);
+			g.drawImage(vImg, 0, 0, this);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -71,11 +71,11 @@ abstract class PK00 extends Canvas implements KeyListener {
 	private Map<Integer, Integer> keyMask = new ConcurrentHashMap<Integer, Integer>();
 
 	// -----------------------------------------------------------------------------
-	public void clr_kb(int vk) {
+	public void clrKb(int vk) {
 		keyMask.remove(new Integer(vk));
 	}
 
-	public void set_kb(int vk, int mask) {
+	public void setKb(int vk, int mask) {
 		keyMask.put(new Integer(vk), new Integer(mask));
 	}
 
@@ -111,15 +111,15 @@ abstract class PK00 extends Canvas implements KeyListener {
 
 		if (brow < 8 && bcol < 8)
 			if (press)
-				pk.kbd_base[bcol] |= (1 << brow);
+				pk.kbdBase[bcol] |= (1 << brow);
 			else
-				pk.kbd_base[bcol] &= ~(1 << brow);
+				pk.kbdBase[bcol] &= ~(1 << brow);
 
 		if (erow < 8 && ecol < 4)
 			if (press)
-				pk.kbd_ext[ecol] |= (1 << erow);
+				pk.kbdExt[ecol] |= (1 << erow);
 			else
-				pk.kbd_ext[ecol] &= ~(1 << erow);
+				pk.kbdExt[ecol] &= ~(1 << erow);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -136,41 +136,41 @@ abstract class PK00 extends Canvas implements KeyListener {
 				(byte)0xC0, (byte)0xC0, (byte)0xC0, (byte)0xFF };
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private boolean render_interlaced;
-	private Image v_img;
-	private MemoryImageSource v_src;
-	private byte[] v_mem = new byte[256 * 7 * 256 * 4]; // up to 1792x1024
-	private byte[][] v_pal = new byte[256][4];
+	private boolean renderInterlaced;
+	private Image vImg;
+	private MemoryImageSource vSrc;
+	private byte[] vMem = new byte[256 * 7 * 256 * 4]; // up to 1792x1024
+	private byte[][] vPal = new byte[256][4];
 
 	// -----------------------------------------------------------------------------
-	private void make_v_pal() {
+	private void makeVPal() {
 		int i, j, pal = pk.ports[0xC1];
 		for (i = 0; i < 256; i++)
 			for (j = 0; j < 4; j++)
-				v_pal[i][3 - j] = Lvov.compute_color_index(pal, (i >> j & 1) | (i >> j + 3 & 2));
+				vPal[i][3 - j] = Lvov.computeColorIndex(pal, (i >> j & 1) | (i >> j + 3 & 2));
 	}
 
 	// -----------------------------------------------------------------------------
-	private void update_v_line(int line) {
+	private void updateVLine(int line) {
 		for (int i = 0; i < scaleY; i++) {
-			update_v_line(line, i);
+			updateVLine(line, i);
 		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private void update_v_line(int line, int row) {
+	private void updateVLine(int line, int row) {
 		int i = line, j = line + 64, p = i * 4 * scaleX * scaleY + (row * scaleX * 256);
 		byte[] c;
 		
-		if (render_interlaced && scaleY > 1 && row >= (scaleY >> 1)) {
+		if (renderInterlaced && scaleY > 1 && row >= (scaleY >> 1)) {
 			for (i = p, j = p + 64 * 4 * scaleX; i < j; i++)
-				v_mem[p++] = 0;
+				vMem[p++] = 0;
 		} else {
 			for (; i < j; i++) {
-				c = v_pal[pk.video[i]];
+				c = vPal[pk.video[i]];
 				for (int v = 0; v < 4; v++) {
 					for (int s = 0; s < scaleX; s++) {
-						v_mem[p++] = c[v];
+						vMem[p++] = c[v];
 					}
 				}
 			}
@@ -180,22 +180,22 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// -----------------------------------------------------------------------------
 	// V i d e o H a n d l i n g
 	// -----------------------------------------------------------------------------
-	void update_image() {
+	void updateImage() {
 		int i, j, p;
 		if (pk.dirty == null) {
 			pk.dirty = new boolean[256];
-			make_v_pal();
+			makeVPal();
 			for (p = i = 0; i < 256; i++, p += 64)
-				update_v_line(p);
-			v_src.newPixels();
+				updateVLine(p);
+			vSrc.newPixels();
 		} else {
 			for (p = i = 0; i < 256; i++, p += 64) {
 				for (j = i; j < 256 && pk.dirty[j]; j++, p += 64) {
-					update_v_line(p);
+					updateVLine(p);
 					pk.dirty[j] = false;
 				}
 				if (j > i) {
-					v_src.newPixels(0, scaleY * i, scaleX * 256, scaleY * (j - i));
+					vSrc.newPixels(0, scaleY * i, scaleX * 256, scaleY * (j - i));
 					i = j;
 				}
 			}
@@ -203,15 +203,15 @@ abstract class PK00 extends Canvas implements KeyListener {
 	}
 
 	// -----------------------------------------------------------------------------
-	void render_as(int mode) {
+	void renderAs(int mode) {
 		pk.dirty = null;
-		render_interlaced = (mode > 1 && mode % 2 != 0);
+		renderInterlaced = (mode > 1 && mode % 2 != 0);
 		scaleX = scaleFactors[mode / 2][0];
 		scaleY = scaleFactors[mode / 2][1];
-		v_src = new MemoryImageSource(256 * scaleX, 256 * scaleY, new IndexColorModel(8, 8, r, g, b), v_mem, 0, 256 * scaleX);
-		v_src.setAnimated(true);
-		v_src.setFullBufferUpdates(false);
-		v_img = createImage(v_src);
+		vSrc = new MemoryImageSource(256 * scaleX, 256 * scaleY, new IndexColorModel(8, 8, r, g, b), vMem, 0, 256 * scaleX);
+		vSrc.setAnimated(true);
+		vSrc.setFullBufferUpdates(false);
+		vImg = createImage(vSrc);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -222,8 +222,8 @@ abstract class PK00 extends Canvas implements KeyListener {
 	}
 
 	// -----------------------------------------------------------------------------
-	void snapshot(OutputStream To) throws Exception {
-		Bitmap.save4(To, v_mem, scaleX * 256, scaleY * 256, new byte[][] { r, g, b }, 8);
+	void snapshot(OutputStream to) throws Exception {
+		Bitmap.save4(to, vMem, scaleX * 256, scaleY * 256, new byte[][] { r, g, b }, 8);
 	}
 
 	// -----------------------------------------------------------------------------

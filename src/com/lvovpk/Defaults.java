@@ -16,7 +16,7 @@ class Defaults {
 
 		cfg.put("BiosFile", "bios.gz");
 		cfg.put("DumpFile", "boot.lvd");
-		cfg.put("HALT_ON_INVALID", "Yes");
+		cfg.put("HaltOnInvalid", "Yes");
 		cfg.put("Speaker", "80");
 		cfg.put("SpeakMode", "2");
 		cfg.put("SpeakSlow", "No");

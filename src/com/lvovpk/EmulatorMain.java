@@ -21,9 +21,9 @@ public class EmulatorMain extends EmulatorUI {
 	@Override
 	public void init() {
 		super.init();
-		if (init_failed == null && args != null && args.length >= 1 && !args[0].equals("-r"))
+		if (initFailed == null && args != null && args.length >= 1 && !args[0].equals("-r"))
 			restore(args[0]);
-		else if (init_failed == null && args != null && args.length >= 3 && args[0].equals("-r"))
+		else if (initFailed == null && args != null && args.length >= 3 && args[0].equals("-r"))
 			restore(args[2]);
 	}
 
@@ -31,8 +31,7 @@ public class EmulatorMain extends EmulatorUI {
 	private static void parse(String output, int codepage) throws IOException {
 		StringBuffer sb = new StringBuffer();
 		InputStreamReader in = new InputStreamReader(System.in);
-		for (int ch; (ch = in.read()) >= 0; sb.append((char) ch))
-			;
+		for (int ch; (ch = in.read()) >= 0; sb.append((char) ch));
 		in.close();
 
 		OutputStream out = Utils.ZIP(output, new FileOutputStream(output));
@@ -70,27 +69,27 @@ public class EmulatorMain extends EmulatorUI {
 
 			// -----------------------------------------------------------------------------
 			if (args[0].equals("-d")) {
-				em.config_dump(args[1]);
+				em.configDump(args[1]);
 				System.out.println(args[1] + " - Config Dumped OK");
 			} else if (args[0].startsWith("-p")) {
 				if (args[0].endsWith("866"))
-					parse(args[1], PKIO.cp_866_u);
+					parse(args[1], PKIO.CP_866_U);
 				else if (args[0].endsWith("1251"))
-					parse(args[1], PKIO.cp_1251_u);
+					parse(args[1], PKIO.CP_1251_U);
 				else if (args[0].endsWith("koi8"))
-					parse(args[1], PKIO.cp_koi8_u);
+					parse(args[1], PKIO.CP_KOI8_U);
 				else
-					parse(args[1], PKIO.cp_default);
+					parse(args[1], PKIO.CP_DEFAULT);
 				System.out.println(args[1] + " - Stdin Parsed OK");
 			} else if (args[0].startsWith("-v")) {
 				if (args[0].endsWith("866"))
-					view(args[1], PKIO.cp_866_u);
+					view(args[1], PKIO.CP_866_U);
 				else if (args[0].endsWith("1251"))
-					view(args[1], PKIO.cp_1251_u);
+					view(args[1], PKIO.CP_1251_U);
 				else if (args[0].endsWith("koi8"))
-					view(args[1], PKIO.cp_koi8_u);
+					view(args[1], PKIO.CP_KOI8_U);
 				else
-					view(args[1], PKIO.cp_default);
+					view(args[1], PKIO.CP_DEFAULT);
 			}
 
 			// -----------------------------------------------------------------------------

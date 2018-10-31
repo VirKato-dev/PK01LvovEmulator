@@ -35,16 +35,16 @@ public class Utils {
 			vct.insertElementAt(key, i);
 		}
 
-		String Result[] = new String[vct.size()]; // then prepare data for client
+		String result[] = new String[vct.size()]; // then prepare data for client
 
 		if (ascend)
 			for (i = 0; i < vct.size(); i++) // ok, leave intact
-				Result[i] = vct.elementAt(i).toString();
+				result[i] = vct.elementAt(i).toString();
 		else
 			for (i = 0; i < vct.size(); i++) // hmm, needs to reverse order of data
-				Result[vct.size() - i - 1] = vct.elementAt(i).toString();
+				result[vct.size() - i - 1] = vct.elementAt(i).toString();
 
-		return Result;
+		return result;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -123,8 +123,7 @@ public class Utils {
 	}
 
 	public static void dumpBytes(OutputStream to, String dat, int off, int len) throws IOException {
-		for (int i = 0; i < len; dumpByte(to, dat.charAt(off + i)), i++)
-			;
+		for (int i = 0; i < len; dumpByte(to, dat.charAt(off + i)), i++);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -133,8 +132,7 @@ public class Utils {
 	}
 
 	public static void dumpBytes(OutputStream to, int dat[], int off, int len) throws IOException {
-		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++)
-			;
+		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -143,8 +141,7 @@ public class Utils {
 	}
 
 	public static void dumpBytes(OutputStream to, short dat[], int off, int len) throws IOException {
-		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++)
-			;
+		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -153,8 +150,7 @@ public class Utils {
 	}
 
 	public static void dumpBytes(OutputStream to, byte dat[], int off, int len) throws IOException {
-		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++)
-			;
+		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -185,8 +181,7 @@ public class Utils {
 	}
 
 	public static void restoreBytes(InputStream from, int dat[], int off, int len) throws IOException {
-		for (int i = 0; i < len; dat[off + i] = restoreByte(from), i++)
-			;
+		for (int i = 0; i < len; dat[off + i] = restoreByte(from), i++);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -195,8 +190,7 @@ public class Utils {
 	}
 
 	public static void restoreBytes(InputStream from, short dat[], int off, int len) throws IOException {
-		for (int i = 0; i < len; dat[off + i] = (short) restoreByte(from), i++)
-			;
+		for (int i = 0; i < len; dat[off + i] = (short) restoreByte(from), i++);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -205,23 +199,22 @@ public class Utils {
 	}
 
 	public static void restoreBytes(InputStream from, byte dat[], int off, int len) throws IOException {
-		for (int i = 0; i < len; dat[off + i] = (byte) restoreByte(from), i++)
-			;
+		for (int i = 0; i < len; dat[off + i] = (byte) restoreByte(from), i++);
 	}
 
 	// -----------------------------------------------------------------------------
-	public static InputStream ZIP(String Name, InputStream Stream) throws IOException {
-		Stream = new BufferedInputStream(Stream, 1024);
-		if (Name.endsWith(".gz")) // if file is packed - unpack it
-			Stream = new GZIPInputStream(Stream);
-		return Stream;
+	public static InputStream ZIP(String name, InputStream stream) throws IOException {
+		stream = new BufferedInputStream(stream, 1024);
+		if (name.endsWith(".gz")) // if file is packed - unpack it
+			stream = new GZIPInputStream(stream);
+		return stream;
 	}
 
-	public static OutputStream ZIP(String Name, OutputStream Stream) throws IOException {
-		Stream = new BufferedOutputStream(Stream, 1024);
-		if (Name.endsWith(".gz")) // if file is packable - pack it
-			Stream = new GZIPOutputStream(Stream);
-		return Stream;
+	public static OutputStream ZIP(String name, OutputStream stream) throws IOException {
+		stream = new BufferedOutputStream(stream, 1024);
+		if (name.endsWith(".gz")) // if file is packable - pack it
+			stream = new GZIPOutputStream(stream);
+		return stream;
 	}
 
 	// -----------------------------------------------------------------------------

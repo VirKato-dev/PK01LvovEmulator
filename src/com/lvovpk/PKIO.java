@@ -10,17 +10,17 @@ import java.io.OutputStream;
  */
 class PKIO {
 
-	final static int cp_866_u = 0;
-	final static int cp_1251_u = 1;
-	final static int cp_koi8_u = 2;
-	final static int cp_866_n = 3;
-	final static int cp_1251_n = 4;
-	final static int cp_koi8_n = 5;
+	final static int CP_866_U = 0;
+	final static int CP_1251_U = 1;
+	final static int CP_KOI8_U = 2;
+	final static int CP_866_N = 3;
+	final static int CP_1251_N = 4;
+	final static int CP_KOI8_N = 5;
 
-	final static int cp_default = cp_1251_u;
+	final static int CP_DEFAULT = CP_1251_U;
 
 	// -----------------------------------------------------------------------------
-	final static String nl = System.getProperty("line.separator", "\r\n");
+	final static String NL = System.getProperty("line.separator", "\r\n");
 
 	private static String codes[][] = {
 		
@@ -148,108 +148,108 @@ class PKIO {
 	};
 
 	// -----------------------------------------------------------------------------
-	static int recognize(InputStream Prog) throws IOException {
-		int Sign[] = new int[16];
-		Utils.restoreBytes(Prog, Sign);
+	static int recognize(InputStream prog) throws IOException {
+		int sign[] = new int[16];
+		Utils.restoreBytes(prog, sign);
 
 		for (int i = 0; i < 9; i++) // it's prefix
-			if ("LVOV/2.0/".charAt(i) != Sign[i])
+			if ("LVOV/2.0/".charAt(i) != sign[i])
 				throw new IOException("Wrong .LVT signature at " + i + " !");
 
-		return Sign[9];
+		return sign[9];
 	}
 
 	// -----------------------------------------------------------------------------
-	static void prepare(OutputStream Prog, String Name, int Type, int CP) throws IOException {
-		int Sign[] = new int[16]; // preparing signature
+	static void prepare(OutputStream prog, String name, int type, int cp) throws IOException {
+		int sign[] = new int[16]; // preparing signature
 
 		for (int i = 0; i < 9; i++) // it's prefix
-			Sign[i] = "LVOV/2.0/".charAt(i);
+			sign[i] = "LVOV/2.0/".charAt(i);
 
-		Sign[9] = Type; // type of file
+		sign[9] = type; // type of file
 
-		for (int i = 0; i < Name.length() && i < 6; i++) // and file name
-			Sign[10 + i] = (byte) dos2koi(Name.charAt(i), CP);
+		for (int i = 0; i < name.length() && i < 6; i++) // and file name
+			sign[10 + i] = (byte) dos2koi(name.charAt(i), cp);
 
-		for (int i = Name.length(); i < 6; i++) // padded with spaces
-			Sign[10 + i] = ' ';
+		for (int i = name.length(); i < 6; i++) // padded with spaces
+			sign[10 + i] = ' ';
 
-		Utils.dumpBytes(Prog, Sign); // well, signature has been completed
+		Utils.dumpBytes(prog, sign); // well, signature has been completed
 	}
 
 	// -----------------------------------------------------------------------------
-	static String basic2text(InputStream Prog, int CP) throws IOException {
-		if (recognize(Prog) != 0xD3)
+	static String basic2text(InputStream prog, int cp) throws IOException {
+		if (recognize(prog) != 0xD3)
 			throw new IOException("Not a Basic program");
 
 		int ch, line;
 		StringBuffer text = new StringBuffer();
 
-		while (Utils.restoreWord(Prog) != 0) {
-			line = Utils.restoreWord(Prog);
+		while (Utils.restoreWord(prog) != 0) {
+			line = Utils.restoreWord(prog);
 			text.append(line).append(' ');
-			while ((ch = Utils.restoreByte(Prog)) != 0) {
+			while ((ch = Utils.restoreByte(prog)) != 0) {
 				if ((ch & 0x80) != 0)
 					text.append(toks[ch - 0x80]);
 				else
-					text.append(koi2dos((char) ch, CP));
+					text.append(koi2dos((char) ch, cp));
 			}
-			text.append(nl);
+			text.append(NL);
 		}
 		return text.toString();
 	}
 
 	// -----------------------------------------------------------------------------
-	static byte[] text2basic(String Text, int CP) throws IOException {
-		return text2basic("AUTO", Text, CP);
+	static byte[] text2basic(String text, int cp) throws IOException {
+		return text2basic("AUTO", text, cp);
 	}
 
 	// -----------------------------------------------------------------------------
-	static byte[] text2basic(String Name, String Text, int CP) throws IOException {
+	static byte[] text2basic(String name, String text, int cp) throws IOException {
 		ByteArrayOutputStream prog = new ByteArrayOutputStream();
 		ByteArrayOutputStream line = new ByteArrayOutputStream();
 
-		prepare(prog, Name, 0xD3, CP);
+		prepare(prog, name, 0xD3, cp);
 
-		Text = dos2koi(Text, CP); // source must be in koi8
-		int pos = 0, total = Text.length(), addr = 0x1723, numb, last_numb = -1;
+		text = dos2koi(text, cp); // source must be in koi8
+		int pos = 0, total = text.length(), addr = 0x1723, numb, lastNumb = -1;
 
 		for (;;) // main consuming cycle
 		{
-			int npos1 = Utils.spanAllow(Text, pos, "\t\r\n "); // skip blank
-			int npos2 = Utils.spanAllow(Text, npos1, "0123456789"); // parse num
-			int nstr1 = Utils.spanAllow(Text, npos2, "\t "); // skip blank
-			int nstr2 = Utils.spanDeny(Text, nstr1, "\r\n"); // parse rest
+			int npos1 = Utils.spanAllow(text, pos, "\t\r\n "); // skip blank
+			int npos2 = Utils.spanAllow(text, npos1, "0123456789"); // parse num
+			int nstr1 = Utils.spanAllow(text, npos2, "\t "); // skip blank
+			int nstr2 = Utils.spanDeny(text, nstr1, "\r\n"); // parse rest
 
 			if (npos1 >= total)
 				break; // all data were read
 			if (npos1 == npos2 || nstr1 == npos2)
-				throw new IOException("Not a line no.: " + Text.substring(npos1, nstr2));
-			numb = Integer.parseInt(Text.substring(npos1, npos2));
-			if (numb > 65535 || numb <= last_numb)
+				throw new IOException("Not a line no.: " + text.substring(npos1, nstr2));
+			numb = Integer.parseInt(text.substring(npos1, npos2));
+			if (numb > 65535 || numb <= lastNumb)
 				throw new IOException(numb > 65535 ? "Line no. " + numb + " is too big"
-						: "Line no. " + numb + " is too small," + " must be .GT. " + last_numb);
-			last_numb = numb;
+						: "Line no. " + numb + " is too small," + " must be .GT. " + lastNumb);
+			lastNumb = numb;
 
 			String skip = null;
 			int tok = toks.length;
 			Utils.dumpWord(line, numb); // storing line number
 			for (pos = nstr1; pos < nstr2;) // beginning line processing...
 			{
-				int ch = Text.charAt(pos);
+				int ch = text.charAt(pos);
 				if (ch == '"') // skip until next '"' or EOL
 				{
-					nstr1 = Utils.spanDeny(Text, pos + 1, "\"\r\n");
+					nstr1 = Utils.spanDeny(text, pos + 1, "\"\r\n");
 					if (nstr1 < nstr2)
 						nstr1++; // skip trailing '"'
-					Utils.dumpBytes(line, Text, pos, nstr1 - pos);
+					Utils.dumpBytes(line, text, pos, nstr1 - pos);
 					pos = nstr1;
 					continue;
 				}
 
 				if (skip == null)
 					for (tok = 0; tok < toks.length; tok++) // token?
-						if (Text.startsWith(toks[tok], pos))
+						if (text.startsWith(toks[tok], pos))
 							break;
 
 				if (tok < toks.length) // yes, store token value

@@ -18,7 +18,7 @@ class PK01 extends PK00 {
 	// Bios def
 	// --------------------------------------------------------------------
 	PK01() {
-		super(mode_first);
+		super(MODE_FIRST);
 	}
 
 	PK01(int mode) {
@@ -26,12 +26,12 @@ class PK01 extends PK00 {
 	}
 
 	// -----------------------------------------------------------------------------
-	void init_printer(int size) {
-		pk.set_print_space(size);
+	void initPrinter(int size) {
+		pk.setPrintSpace(size);
 	}
 
-	void init_speaker(int size) {
-		pk.set_speak_space(size);
+	void initSpeaker(int size) {
+		pk.setSpeakSpace(size);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -63,95 +63,95 @@ class PK01 extends PK00 {
 	// -----------------------------------------------------------------------------
 	// G U E S T M a n i p u l a t i o n s
 	// -----------------------------------------------------------------------------
-	void cold_start() {
+	void coldStart() {
 		pk.reset();
-		pk.r_PC = 0xC000;
-		pk.cpu_halt_state = false;
+		pk.rPC = 0xC000;
+		pk.cpuHaltState = false;
 	}
 
 	// -----------------------------------------------------------------------------
-	private void set_var(int var, int val) {
+	private void setVar(int var, int val) {
 		pk.memory[var] = (short) (val & 0xFF);
 		pk.memory[var + 1] = (short) (val / 256 & 0xFF);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - -
-	private int get_var(int var) {
+	private int getVar(int var) {
 		return pk.memory[var] + pk.memory[var + 1] * 256;
 	}
 
 	// -----------------------------------------------------------------------------
-	void warm_start() {
+	void warmStart() {
 		pk.ports[0xC2] = 0xFF;
-		set_var(pk.r_SP = Bios.BasicStack, Bios.BasicHotEntry);
-		pk.r_PC = Bios.BasicHotEntry;
-		pk.cpu_halt_state = false;
+		setVar(pk.rSP = Bios.BASIC_STACK, Bios.BASIC_HOT_ENTRY);
+		pk.rPC = Bios.BASIC_HOT_ENTRY;
+		pk.cpuHaltState = false;
 	}
 
 	// -----------------------------------------------------------------------------
-	private void load_prog_basic(InputStream Prog) throws IOException {
-		warm_start();
-		int pos = get_var(Bios.BasicProgBegin);
+	private void loadProgBasic(InputStream prog) throws IOException {
+		warmStart();
+		int pos = getVar(Bios.BASIC_PROG_BEGIN);
 		try {
 			for (;; pos++)
-				pk.do_write(pos, Utils.restoreByte(Prog));
+				pk.doWrite(pos, Utils.restoreByte(prog));
 		} catch (EOFException ex) {
 		}
-		set_var(Bios.BasicProgEnd, pos);
+		setVar(Bios.BASIC_PROG_END, pos);
 	}
 
 	// -----------------------------------------------------------------------------
-	private void save_prog_basic(OutputStream Prog) throws IOException {
-		int pos = get_var(Bios.BasicProgBegin), cnt;
+	private void saveProgBasic(OutputStream prog) throws IOException {
+		int pos = getVar(Bios.BASIC_PROG_BEGIN), cnt;
 		for (cnt = 0; pos <= 0xFFFF && cnt < 3; pos++) {
-			int bt = pk.do_read(pos);
+			int bt = pk.doRead(pos);
 			if (bt == 0)
 				cnt++;
 			else
 				cnt = 0;
-			Utils.dumpByte(Prog, bt);
+			Utils.dumpByte(prog, bt);
 		}
 	}
 
 	// -----------------------------------------------------------------------------
-	private void load_prog_binary(InputStream Prog, boolean manual) throws IOException {
-		int beg = Utils.restoreWord(Prog);
-		int end = Utils.restoreWord(Prog);
-		int run = Utils.restoreWord(Prog);
-		int ofs = get_var(Bios.LoadBinaryOfs);
+	private void loadProgBinary(InputStream prog, boolean manual) throws IOException {
+		int beg = Utils.restoreWord(prog);
+		int end = Utils.restoreWord(prog);
+		int run = Utils.restoreWord(prog);
+		int ofs = getVar(Bios.LOAD_BINARY_OFS);
 
 		if (manual) {
-			warm_start();
-			pk.r_PC = run;
+			warmStart();
+			pk.rPC = run;
 		} else {
 			beg += ofs;
 			end += ofs;
-			set_var(Bios.LoadBinaryEntry, run);
+			setVar(Bios.LOAD_BINARY_ENTRY, run);
 		}
 		for (int pos = beg; pos <= end; pos++)
-			pk.do_write(pos, Utils.restoreByte(Prog));
+			pk.doWrite(pos, Utils.restoreByte(prog));
 	}
 
 	// -----------------------------------------------------------------------------
-	private void save_prog_binary(OutputStream Prog, int from, int upto, int epo) throws IOException {
-		Utils.dumpWord(Prog, from);
-		Utils.dumpWord(Prog, upto);
-		Utils.dumpWord(Prog, epo);
+	private void saveProgBinary(OutputStream prog, int from, int upto, int epo) throws IOException {
+		Utils.dumpWord(prog, from);
+		Utils.dumpWord(prog, upto);
+		Utils.dumpWord(prog, epo);
 
 		for (int pos = from; pos <= upto; pos++)
-			Utils.dumpByte(Prog, pk.do_read(pos));
+			Utils.dumpByte(prog, pk.doRead(pos));
 	}
 
 	// -----------------------------------------------------------------------------
-	void load_prog(InputStream Prog, boolean manual) throws IOException {
-		int type = PKIO.recognize(Prog);
+	void loadProg(InputStream prog, boolean manual) throws IOException {
+		int type = PKIO.recognize(prog);
 		switch (type) {
 		case 0xD3:
-			load_prog_basic(Prog);
+			loadProgBasic(prog);
 			break;
 		case 0xD0:
-			load_prog_binary(Prog, manual);
+			loadProgBinary(prog, manual);
 			break;
 		default:
 			throw new IOException("Unknown .LVT type " + Utils.HEX(type));
@@ -159,98 +159,98 @@ class PK01 extends PK00 {
 	}
 
 	// -----------------------------------------------------------------------------
-	void save_prog(OutputStream Prog, String Name) throws IOException {
-		PKIO.prepare(Prog, Name, 0xD3, PKIO.cp_default);
-		save_prog_basic(Prog);
+	void saveProg(OutputStream prog, String name) throws IOException {
+		PKIO.prepare(prog, name, 0xD3, PKIO.CP_DEFAULT);
+		saveProgBasic(prog);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	void save_prog(OutputStream Prog, String Name, int from, int upto) throws IOException {
-		save_prog(Prog, Name, from, upto, from);
+	void saveProg(OutputStream prog, String name, int from, int upto) throws IOException {
+		saveProg(prog, name, from, upto, from);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	void save_prog(OutputStream Prog, String Name, int from, int upto, int epo) throws IOException {
-		PKIO.prepare(Prog, Name, 0xD0, PKIO.cp_default);
-		save_prog_binary(Prog, from, upto, epo);
+	void saveProg(OutputStream prog, String name, int from, int upto, int epo) throws IOException {
+		PKIO.prepare(prog, name, 0xD0, PKIO.CP_DEFAULT);
+		saveProgBinary(prog, from, upto, epo);
 	}
 
 	// -----------------------------------------------------------------------------
-	void load_bios(InputStream Bios) throws IOException {
-		int type = PKIO.recognize(Bios);
+	void loadBios(InputStream bios) throws IOException {
+		int type = PKIO.recognize(bios);
 		if (type != 0xD0)
 			throw new IOException("Not a binary .LVT !");
-		Utils.restoreWord(Bios); // beg
-		Utils.restoreWord(Bios); // end
-		Utils.restoreWord(Bios); // run
-		Utils.restoreBytes(Bios, pk.memory, 0xC000, 0x4000);
+		Utils.restoreWord(bios); // beg
+		Utils.restoreWord(bios); // end
+		Utils.restoreWord(bios); // run
+		Utils.restoreBytes(bios, pk.memory, 0xC000, 0x4000);
 	}
 
 	// -----------------------------------------------------------------------------
-	void dump(OutputStream To, boolean full) throws Exception {
-		String Sign = full ? "LVOV/DUMP/3.0/F\u0000" : "LVOV/DUMP/3.0/P\u0000";
-		Utils.dumpBytes(To, Sign);
+	void dump(OutputStream to, boolean full) throws Exception {
+		String sign = full ? "LVOV/DUMP/3.0/F\u0000" : "LVOV/DUMP/3.0/P\u0000";
+		Utils.dumpBytes(to, sign);
 
-		Utils.dumpBytes(To, new int[16]); // row 1 - flags (full dump)
-		Utils.dumpBytes(To,
+		Utils.dumpBytes(to, new int[16]); // row 1 - flags (full dump)
+		Utils.dumpBytes(to,
 				new int[] { // row 2 - registers [16]
-						((pk.r_PC >> 8) & 0xFF), (pk.r_PC & 0xFF), ((pk.r_SP >> 8) & 0xFF), (pk.r_SP & 0xFF), pk.r_A,
-						pk.r_F, pk.r_B, pk.r_C, pk.r_D, pk.r_E, pk.r_H, pk.r_L, 0, 0, 0, 0 });
-		Utils.dumpBytes(To,
+						((pk.rPC >> 8) & 0xFF), (pk.rPC & 0xFF), ((pk.rSP >> 8) & 0xFF), (pk.rSP & 0xFF), pk.rA,
+						pk.rF, pk.rB, pk.rC, pk.rD, pk.rE, pk.rH, pk.rL, 0, 0, 0, 0 });
+		Utils.dumpBytes(to,
 				new int[] { // row 3 - ports [16]
 						pk.ports[0xC0], pk.ports[0xC1], pk.ports[0xC2], pk.ports[0xC3], pk.ports[0xD0], pk.ports[0xD1],
 						pk.ports[0xD2], pk.ports[0xD3], 0, 0, 0, 0, 0, 0, 0, 0 });
-		Utils.dumpBytes(To, pk.video);
+		Utils.dumpBytes(to, pk.video);
 		if (full)
-			Utils.dumpBytes(To, pk.memory);
+			Utils.dumpBytes(to, pk.memory);
 		else
-			Utils.dumpBytes(To, pk.memory, 0, 0xC000);
+			Utils.dumpBytes(to, pk.memory, 0, 0xC000);
 	}
 
 	// -----------------------------------------------------------------------------
-	boolean restore(InputStream From) throws Exception {
-		int Sign[] = new int[16];
+	boolean restore(InputStream from) throws Exception {
+		int sign[] = new int[16];
 
-		Utils.restoreBytes(From, Sign); // row 0 - signature
+		Utils.restoreBytes(from, sign); // row 0 - signature
 		for (int i = 0; i < 14; i++)
-			if ("LVOV/DUMP/3.0/".charAt(i) != Sign[i])
+			if ("LVOV/DUMP/3.0/".charAt(i) != sign[i])
 				throw new Exception("Wrong .LVD sign at " + i + " !");
 
 		boolean full = false;
-		if (Sign[14] == 'F')
+		if (sign[14] == 'F')
 			full = true;
-		else if (Sign[14] != 'P')
-			throw new Exception("Wrong .LVD sub-sign: " + Utils.HEX(Sign[14]));
+		else if (sign[14] != 'P')
+			throw new Exception("Wrong .LVD sub-sign: " + Utils.HEX(sign[14]));
 
-		short Line[] = new short[16];
-		Utils.restoreBytes(From, Line);
+		short line[] = new short[16];
+		Utils.restoreBytes(from, line);
 		if (full) // row 1 - flags (full dump)
 		{
 		}
 
-		Utils.restoreBytes(From, Line); // row 2 - registers
-		pk.r_PC = Line[0] * 256 + Line[1];
-		pk.r_SP = Line[2] * 256 + Line[3];
-		pk.r_A = Line[4];
-		pk.r_F = Line[5];
-		pk.r_B = Line[6];
-		pk.r_C = Line[7];
-		pk.r_D = Line[8];
-		pk.r_E = Line[9];
-		pk.r_H = Line[10];
-		pk.r_L = Line[11];
+		Utils.restoreBytes(from, line); // row 2 - registers
+		pk.rPC = line[0] * 256 + line[1];
+		pk.rSP = line[2] * 256 + line[3];
+		pk.rA = line[4];
+		pk.rF = line[5];
+		pk.rB = line[6];
+		pk.rC = line[7];
+		pk.rD = line[8];
+		pk.rE = line[9];
+		pk.rH = line[10];
+		pk.rL = line[11];
 
-		Utils.restoreBytes(From, Line); // row 3 - ports
+		Utils.restoreBytes(from, line); // row 3 - ports
 		for (int i = 0; i < 4; i++)
-			pk.ports[0xC0 + i] = Line[i];
+			pk.ports[0xC0 + i] = line[i];
 		for (int i = 0; i < 4; i++)
-			pk.ports[0xD0 + i] = Line[i + 4];
+			pk.ports[0xD0 + i] = line[i + 4];
 
-		Utils.restoreBytes(From, pk.video);
+		Utils.restoreBytes(from, pk.video);
 		if (full)
-			Utils.restoreBytes(From, pk.memory);
+			Utils.restoreBytes(from, pk.memory);
 		else
-			Utils.restoreBytes(From, pk.memory, 0, 0xC000);
+			Utils.restoreBytes(from, pk.memory, 0, 0xC000);
 
 		pk.dirty = null;
 		return !full;

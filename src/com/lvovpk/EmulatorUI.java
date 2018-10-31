@@ -41,17 +41,17 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	 * 
 	 */
 	private static final long serialVersionUID = 46689693694740808L;
-	static final int cmConfig = 19;
-	static final int cmInvokeEditor = 20;
-	static final int cmSyncEditorIn = 21;
-	static final int cmSyncEditorOut = 22;
-	static final int cmInvokeDebugger = 23;
-	static final int cmInvokeAbout = 24;
-	static final int cmInvokeLog = 25;
-	static final int cmChangeTicks = 26;
-	static final int cmVolCtl = 1000;
+	static final int CM_CONFIG = 19;
+	static final int CM_INVOKE_EDITOR = 20;
+	static final int CM_SYNC_EDITOR_IN = 21;
+	static final int CM_SYNC_EDITOR_OUT = 22;
+	static final int CM_INVOKE_DEBUGGER = 23;
+	static final int CM_INVOKE_ABOUT = 24;
+	static final int CM_INVOKE_LOG = 25;
+	static final int CM_CHANGE_TICKS = 26;
+	static final int CM_VOL_CTL = 1000;
 	
-	static final int menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+	static final int MENU_SHORTCUT_KEY_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
 	private JPopupMenu pm = null;
 	private EditorWindow tx;
@@ -62,12 +62,12 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	private String configFileName = null;
 	private String currentDir = null;
 
-	public final void do_config_dump(String Name) {
-		config_dump(Name);
+	public final void doConfigDump(String name) {
+		configDump(name);
 	} // save default configuration
 
 	// -----------------------------------------------------------------------------
-	void config_dump(String tf) {
+	void configDump(String tf) {
 		try {
 			String k[];
 			PrintWriter o = new PrintWriter(new FileOutputStream(tf));
@@ -93,7 +93,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		}
 	}
 
-	void config_load(String tf) {
+	void configLoad(String tf) {
 		writeLog("Loading configurations from file...");
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tf));
@@ -119,7 +119,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	// -----------------------------------------------------------------------------
 	@Override
 	public void run() {
-		while (ireq != cmStop)
+		while (ireq != CM_STOP)
 			super.run();
 	}
 
@@ -142,13 +142,13 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	static {
 		config = new ConcurrentHashMap<String, String>();
 
-		String Menus[][] = new String[][] {
+		String menus[][] = new String[][] {
 			{ "ToolbarTop", "No" },
 			{ "ToolbarBottom", "No" },
 			{ "ToolbarMenu", "Yes" },
 			{ "ContextMenu", "No" }
 		};
-		String Features[][] = new String[][] {
+		String features[][] = new String[][] {
 			{ "Mode", "No", "Yes", "Yes", "Yes" },
 			{ "Fast", "No", "Yes", "Yes", "Yes" },
 			{ "Slow", "No", "Yes", "Yes", "Yes" },
@@ -177,30 +177,30 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		config.put("Enable_Statusbar", "Yes");
 		config.put("Enable_FlatContextMenu", "Yes");
-		for (int i = 0; i < Menus.length; i++) {
-			config.put("Enable_" + Menus[i][0], Menus[i][1]);
-			for (int j = 0; j < Features.length; j++)
-				config.put("Enable_" + Menus[i][0] + "_" + Features[j][0] + "_Feature", Features[j][i + 1]);
+		for (int i = 0; i < menus.length; i++) {
+			config.put("Enable_" + menus[i][0], menus[i][1]);
+			for (int j = 0; j < features.length; j++)
+				config.put("Enable_" + menus[i][0] + "_" + features[j][0] + "_Feature", features[j][i + 1]);
 		}
 	}
 	
 	// -----------------------------------------------------------------------------
-	private void mkMenuItem(JMenu mn, String Name, String Feature, int Command, String Description) {
-		if (cfg("Enable_" + Name + "_" + Feature + "_Feature", "yes")) {
-			int[] shortcut = Keyboard.getShortcutForCommand(Command);
+	private void mkMenuItem(JMenu mn, String name, String feature, int command, String description) {
+		if (cfg("Enable_" + name + "_" + feature + "_Feature", "yes")) {
+			int[] shortcut = Keyboard.getShortcutForCommand(command);
 			if (shortcut != null) {
-				mn.add(GuiUtils.createMenuItem(Command, Description, shortcut[0], shortcut[1], this));
+				mn.add(GuiUtils.createMenuItem(command, description, shortcut[0], shortcut[1], this));
 			}
 			else {
-				mn.add(GuiUtils.createMenuItem(Command, Description, this));
+				mn.add(GuiUtils.createMenuItem(command, description, this));
 			}
 		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	private void mkToolbarButton(JToolBar tb, String Name, String Feature, int Command, String Description) {
-		if (cfg("Enable_" + Name + "_" + Feature + "_Feature", "yes"))
-			tb.add(GuiUtils.createButton(Command, Description, this));
+	private void mkToolbarButton(JToolBar tb, String name, String feature, int command, String description) {
+		if (cfg("Enable_" + name + "_" + feature + "_Feature", "yes"))
+			tb.add(GuiUtils.createButton(command, description, this));
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -228,83 +228,83 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	}
 
 	// -----------------------------------------------------------------------------
-	private void mkToolbar(String Name, JToolBar tb) {
-		mkToolbarButton(tb, Name, "Mode", cmMode, "Mode");
-		mkToolbarButton(tb, Name, "Ticks", cmChangeTicks, "Ticks");
-		mkToolbarButton(tb, Name, "Fast", cmFast, "Fast");
-		mkToolbarButton(tb, Name, "Slow", cmSlow, "Slow");
-		mkToolbarButton(tb, Name, "PRN_O", cmOpenPRN, "oPRN");
-		mkToolbarButton(tb, Name, "PRN_C", cmClosePRN, "cPRN");
+	private void mkToolbar(String name, JToolBar tb) {
+		mkToolbarButton(tb, name, "Mode", CM_MODE, "Mode");
+		mkToolbarButton(tb, name, "Ticks", CM_CHANGE_TICKS, "Ticks");
+		mkToolbarButton(tb, name, "Fast", CM_FAST, "Fast");
+		mkToolbarButton(tb, name, "Slow", CM_SLOW, "Slow");
+		mkToolbarButton(tb, name, "PRN_O", CM_OPEN_PRN, "oPRN");
+		mkToolbarButton(tb, name, "PRN_C", CM_CLOSE_PRN, "cPRN");
 
-		mkToolbarButton(tb, Name, "Speaker", cmVolCtl + 0, "Mute");
-		mkToolbarButton(tb, Name, "Speaker", cmVolCtl + 100, "Loud");
+		mkToolbarButton(tb, name, "Speaker", CM_VOL_CTL + 0, "Mute");
+		mkToolbarButton(tb, name, "Speaker", CM_VOL_CTL + 100, "Loud");
 
-		mkToolbarButton(tb, Name, "Reset", cmReset, "Reset");
-		mkToolbarButton(tb, Name, "Pause", cmPause, "Pause");
-		mkToolbarButton(tb, Name, "Resume", cmResume, "Resume");
-		mkToolbarButton(tb, Name, "Debug", cmInvokeDebugger, "Debug");
+		mkToolbarButton(tb, name, "Reset", CM_RESET, "Reset");
+		mkToolbarButton(tb, name, "Pause", CM_PAUSE, "Pause");
+		mkToolbarButton(tb, name, "Resume", CM_RESUME, "Resume");
+		mkToolbarButton(tb, name, "Debug", CM_INVOKE_DEBUGGER, "Debug");
 
-		mkToolbarButton(tb, Name, "Load", cmLoad, "Load");
-		mkToolbarButton(tb, Name, "Import", cmImport, "Import");
-		mkToolbarButton(tb, Name, "Edit", cmInvokeEditor, "Edit");
-		mkToolbarButton(tb, Name, "Restore", cmRestore, "Restore");
+		mkToolbarButton(tb, name, "Load", CM_LOAD, "Load");
+		mkToolbarButton(tb, name, "Import", CM_IMPORT, "Import");
+		mkToolbarButton(tb, name, "Edit", CM_INVOKE_EDITOR, "Edit");
+		mkToolbarButton(tb, name, "Restore", CM_RESTORE, "Restore");
 
-		mkToolbarButton(tb, Name, "Export", cmExport, "Export");
-		mkToolbarButton(tb, Name, "DumpF", cmDumpF, "Full");
-		mkToolbarButton(tb, Name, "DumpP", cmDumpP, "Partial");
-		mkToolbarButton(tb, Name, "Snap", cmSnap, "Snap");
+		mkToolbarButton(tb, name, "Export", CM_EXPORT, "Export");
+		mkToolbarButton(tb, name, "DumpF", CM_DUMP_F, "Full");
+		mkToolbarButton(tb, name, "DumpP", CM_DUMP_P, "Partial");
+		mkToolbarButton(tb, name, "Snap", CM_SNAP, "Snap");
 
-		mkToolbarButton(tb, Name, "About", cmInvokeAbout, "About");
-		mkToolbarButton(tb, Name, "Log", cmInvokeLog, "Log");
-		mkToolbarButton(tb, Name, "Cfg", cmConfig, "Conf");
-		mkToolbarButton(tb, Name, "Quit", cmStop, "Quit");
+		mkToolbarButton(tb, name, "About", CM_INVOKE_ABOUT, "About");
+		mkToolbarButton(tb, name, "Log", CM_INVOKE_LOG, "Log");
+		mkToolbarButton(tb, name, "Cfg", CM_CONFIG, "Conf");
+		mkToolbarButton(tb, name, "Quit", CM_STOP, "Quit");
 	}
 
 	// -----------------------------------------------------------------------------
-	private void mkMenu(String Name, MenuElement mn, boolean flatten) {
+	private void mkMenu(String name, MenuElement mn, boolean flatten) {
 		JMenu submn;
 
 		submn = new JMenu("Config");
-		mkMenuItem(submn, Name, "Mode", cmMode, "Change rendering mode");
-		mkMenuItem(submn, Name, "Ticks", cmChangeTicks, "Change CPU Clock Ticks");
-		mkMenuItem(submn, Name, "Fast", cmFast, "Emulate at full speed");
-		mkMenuItem(submn, Name, "Slow", cmSlow, "Emulate at real speed");
-		mkMenuItem(submn, Name, "PRN_O", cmOpenPRN, "Open printer");
-		mkMenuItem(submn, Name, "PRN_C", cmClosePRN, "Close printer");
+		mkMenuItem(submn, name, "Mode", CM_MODE, "Change rendering mode");
+		mkMenuItem(submn, name, "Ticks", CM_CHANGE_TICKS, "Change CPU Clock Ticks");
+		mkMenuItem(submn, name, "Fast", CM_FAST, "Emulate at full speed");
+		mkMenuItem(submn, name, "Slow", CM_SLOW, "Emulate at real speed");
+		mkMenuItem(submn, name, "PRN_O", CM_OPEN_PRN, "Open printer");
+		mkMenuItem(submn, name, "PRN_C", CM_CLOSE_PRN, "Close printer");
 
 		JMenu submn2 = new JMenu("Volume");
 		for (int i = 0; i <= 100; i += 10)
-			mkMenuItem(submn2, Name, "Speaker", cmVolCtl + i, "Set volume " + i + "%");
+			mkMenuItem(submn2, name, "Speaker", CM_VOL_CTL + i, "Set volume " + i + "%");
 		mkMenuMenu(submn, submn2, false);
 
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("Control");
-		mkMenuItem(submn, Name, "Reset", cmReset, "Perform cold start sequence");
-		mkMenuItem(submn, Name, "Pause", cmPause, "Pause execution");
-		mkMenuItem(submn, Name, "Resume", cmResume, "Resume execution");
-		mkMenuItem(submn, Name, "Debug", cmInvokeDebugger, "Invoke Code Debugger");
+		mkMenuItem(submn, name, "Reset", CM_RESET, "Perform cold start sequence");
+		mkMenuItem(submn, name, "Pause", CM_PAUSE, "Pause execution");
+		mkMenuItem(submn, name, "Resume", CM_RESUME, "Resume execution");
+		mkMenuItem(submn, name, "Debug", CM_INVOKE_DEBUGGER, "Invoke Code Debugger");
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("Load");
-		mkMenuItem(submn, Name, "Load", cmLoad, "Load program");
-		mkMenuItem(submn, Name, "Import", cmImport, "Import Basic program");
-		mkMenuItem(submn, Name, "Edit", cmInvokeEditor, "Open editor for Basic");
-		mkMenuItem(submn, Name, "Restore", cmRestore, "Restore state from the dump");
+		mkMenuItem(submn, name, "Load", CM_LOAD, "Load program");
+		mkMenuItem(submn, name, "Import", CM_IMPORT, "Import Basic program");
+		mkMenuItem(submn, name, "Edit", CM_INVOKE_EDITOR, "Open editor for Basic");
+		mkMenuItem(submn, name, "Restore", CM_RESTORE, "Restore state from the dump");
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("Store");
-		mkMenuItem(submn, Name, "Export", cmExport, "Export Basic program");
-		mkMenuItem(submn, Name, "DumpF", cmDumpF, "Perform full dump of the emulator state");
-		mkMenuItem(submn, Name, "DumpP", cmDumpP, "Perform partial dump of the emulator state");
-		mkMenuItem(submn, Name, "Snap", cmSnap, "Take a screenshot");
+		mkMenuItem(submn, name, "Export", CM_EXPORT, "Export Basic program");
+		mkMenuItem(submn, name, "DumpF", CM_DUMP_F, "Perform full dump of the emulator state");
+		mkMenuItem(submn, name, "DumpP", CM_DUMP_P, "Perform partial dump of the emulator state");
+		mkMenuItem(submn, name, "Snap", CM_SNAP, "Take a screenshot");
 		mkMenuMenu(mn, submn, flatten);
 
 		submn = new JMenu("General");
-		mkMenuItem(submn, Name, "About", cmInvokeAbout, "About");
-		mkMenuItem(submn, Name, "Log", cmInvokeLog, "Events log");
-		mkMenuItem(submn, Name, "Cfg", cmConfig, "Save default configuration");
-		mkMenuItem(submn, Name, "Quit", cmStop, "Quit");
+		mkMenuItem(submn, name, "About", CM_INVOKE_ABOUT, "About");
+		mkMenuItem(submn, name, "Log", CM_INVOKE_LOG, "Events log");
+		mkMenuItem(submn, name, "Cfg", CM_CONFIG, "Save default configuration");
+		mkMenuItem(submn, name, "Quit", CM_STOP, "Quit");
 		mkMenuMenu(mn, submn, flatten);
 	}
 
@@ -314,7 +314,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		addWindowListener(this);
 		
 		tx = new EditorWindow(this, "Simple Basic Editor", false);
-		tx.setPeer(cmSyncEditorIn, cmSyncEditorOut, this);
+		tx.setPeer(CM_SYNC_EDITOR_IN, CM_SYNC_EDITOR_OUT, this);
 		dbg = new DebuggerWindow(this, "Simple i8080 Debugger (press F1 for help)", true, new LvovDebugger(lv));
 		Keyboard.enableShortcuts = cfg("KeyboardShortcuts", "yes");
 		if (Keyboard.enableShortcuts && (fullScreen || !cfg("Enable_ToolbarMenu", "yes"))) {
@@ -477,121 +477,122 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		switch (cmd) {
-		case cmFast:
-			do_fast();
+		case CM_FAST:
+			doFast();
 			break;
-		case cmSlow:
-			do_slow();
+		case CM_SLOW:
+			doSlow();
 			break;
-		case cmMode:
-			do_cmode();
+		case CM_MODE:
+			doChangeMode();
 			break;
-		case cmChangeTicks:
-			do_pause();
+		case CM_CHANGE_TICKS:
+			doPause();
 			showChangeTicksDialog();
-			do_resume();
+			doResume();
 			break;
-		case cmReset:
-			do_reset();
+		case CM_RESET:
+			doReset();
 			break;
-		case cmPause:
-			do_pause();
+		case CM_PAUSE:
+			doPause();
 			break;
-		case cmResume:
-			do_resume();
+		case CM_RESUME:
+			doResume();
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmLoad:
+		case CM_LOAD:
 			fn = showFileDialog(false, "Choose .LVT program", "lvt");
 			if (fn != null)
-				do_load(fn);
+				doLoad(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmImport:
+		case CM_IMPORT:
 			fn = showFileDialog(false, "Choose .BAS source", "bas");
 			if (fn != null)
-				do_import(fn);
+				doImport(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmExport:
+		case CM_EXPORT:
 			fn = showFileDialog(true, "Choose destination .BAS source", "bas");
 			if (fn != null)
-				do_export(fn);
+				doExport(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmInvokeEditor:
-			perform(cmSyncEditorIn);
+		case CM_INVOKE_EDITOR:
+			perform(CM_SYNC_EDITOR_IN);
 			tx.setVisible(true);
 			break;
-		case cmSyncEditorOut:
-			do_paste(tx.txt.getText());
+		case CM_SYNC_EDITOR_OUT:
+			doPaste(tx.txt.getText());
 			break;
-		case cmSyncEditorIn:
-			tx.txt.setText(do_copy());
+		case CM_SYNC_EDITOR_IN:
+			tx.txt.setText(doCopy());
 			break;
-		case cmInvokeDebugger:
-			do_pause();
+		case CM_INVOKE_DEBUGGER:
+			doPause();
 			dbg.showWindow();
-			do_resume();
+			doResume();
 			break;
-		case cmInvokeAbout:
-			do_pause();
+		case CM_INVOKE_ABOUT:
+			doPause();
 			showAboutDialog();
-			do_resume();
+			doResume();
 			break;
-		case cmInvokeLog:
+		case CM_INVOKE_LOG:
 			log.setVisible(true);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmDumpF:
+		case CM_DUMP_F:
 			fn = showFileDialog(true, "Choose destination .LVD file", "lvd");
 			if (fn != null)
-				do_full_dump(fn);
+				doFullDump(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmDumpP:
+		case CM_DUMP_P:
 			fn = showFileDialog(true, "Choose destination .LVD file", "lvd");
 			if (fn != null)
-				do_partial_dump(fn);
+				doPartialDump(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmSnap:
-			do_pause();
-			fn = showFileDialog(true, "Choose destination image file", "PNG image#png", "GIF image#gif", "JPEG image#jpg", "Bitmap image#bmp");
-			do_resume();
+		case CM_SNAP:
+			doPause();
+			fn = showFileDialog(true, "Choose destination image file",
+					"PNG image#png", "GIF image#gif", "JPEG image#jpg", "Bitmap image#bmp");
+			doResume();
 			if (fn != null)
-				do_snap(fn);
+				doSnap(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmRestore:
+		case CM_RESTORE:
 			fn = showFileDialog(false, "Choose source .LVD file", "lvd");
 			if (fn != null)
-				do_restore(fn);
+				doRestore(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmConfig:
+		case CM_CONFIG:
 			fn = showFileDialog(true, "Choose configuration file", "cfg");
 			if (fn != null)
-				do_config_dump(fn);
+				doConfigDump(fn);
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmOpenPRN:
+		case CM_OPEN_PRN:
 			fn = showFileDialog(true, "Choose device to print to", "print");
 			if (fn != null)
-				do_open_prn(fn);
+				doOpenPrn(fn);
 			break;
-		case cmClosePRN:
-			do_close_prn();
+		case CM_CLOSE_PRN:
+			doClosePrn();
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		case cmStop:
-			ireq = cmStop;
+		case CM_STOP:
+			ireq = CM_STOP;
 			dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		default:
-			if (cmd >= cmVolCtl && cmd <= cmVolCtl + 100)
-				do_volume(cmd - cmVolCtl);
+			if (cmd >= CM_VOL_CTL && cmd <= CM_VOL_CTL + 100)
+				doVolume(cmd - CM_VOL_CTL);
 			break;
 		}
 	}
@@ -651,23 +652,23 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		}
 
 		if (configFileName != null) {
-			config_load(configFileName);
+			configLoad(configFileName);
 		}
 
 		writeLog("Booting Computer...");
 		try {
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			super.init();
-			if (init_failed != null) {
-				writeLog("Boot Error: " + init_failed);
+			if (initFailed != null) {
+				writeLog("Boot Error: " + initFailed);
 				return;
 			}
 			configure();
 			setTitle("PK-01 Lvov Emulator");
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		} catch (Exception ex) {
-			init_failed = ex.toString();
-			writeLog("UI Error: " + init_failed);
+			initFailed = ex.toString();
+			writeLog("UI Error: " + initFailed);
 		}
 	}
 

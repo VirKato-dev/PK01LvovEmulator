@@ -24,18 +24,18 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1660208074679142261L;
-	static final int cmRepaint = -1; // repaint emulator screen
-	static final int cmStop = -2; // stop emulator
+	static final int CM_REPAINT = -1; // repaint emulator screen
+	static final int CM_STOP = -2; // stop emulator
 	int mode;
 	PK01 lv;
 	int ireq;
-	boolean go_fast, go_sound, speak_slow, fullScreen;
-	int speak_mode;
+	boolean goFast, goSound, speakSlow, fullScreen;
+	int speakMode;
 	int ticks;
-	byte volume_up = 127, volume_down = 127;
+	byte volumeUp = 127, volumeDown = 127;
 	Thread framer;
 	LayoutManager fly;
-	String init_failed = null;
+	String initFailed = null;
 	OutputStream printerDevice;
 
 	// -----------------------------------------------------------------------------
@@ -50,12 +50,12 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	boolean open_printer(String name) {
+	boolean openPrinter(String name) {
 		try {
 			if (printerDevice != null)
-				close_printer();
+				closePrinter();
 			printerDevice = Utils.ZIP(name, new FileOutputStream(name));
-			lv.init_printer(4096);
+			lv.initPrinter(4096);
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -63,12 +63,12 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	boolean close_printer() {
+	boolean closePrinter() {
 		try {
 			if (printerDevice != null)
 				printerDevice.close();
 			printerDevice = null;
-			lv.init_printer(0);
+			lv.initPrinter(0);
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -76,7 +76,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	void print_this(byte[] buffer) {
+	void printThis(byte[] buffer) {
 		if (printerDevice != null && buffer != null)
 			try {
 				printerDevice.write(buffer);
@@ -85,25 +85,25 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 	}
 
 	// -----------------------------------------------------------------------------
-	void set_volume(int percent) {
+	void setVolume(int percent) {
 		if (percent < 0)
-			volume_up = 127;
+			volumeUp = 127;
 		else if (percent > 100)
-			volume_up = 0;
+			volumeUp = 0;
 		else
-			volume_up = (byte) (127 * (100 - percent) / 100);
+			volumeUp = (byte) (127 * (100 - percent) / 100);
 
-		if (go_sound) {
+		if (goSound) {
 			// up to 1 second of sound, see: run()
-			lv.init_speaker(volume_up == volume_down ? 0 : 8000);
+			lv.initSpeaker(volumeUp == volumeDown ? 0 : 8000);
 		}
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
 	public void run() {
-		if (ireq == cmRepaint) {
-			lv.render_as(mode);
+		if (ireq == CM_REPAINT) {
+			lv.renderAs(mode);
 			lv.invalidate();
 			validate();
 			lv.repaint();
@@ -111,66 +111,66 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 		}
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		int frames = 0, fps = 50, wait_cycle, idle = 0;
-		long start_frame = System.currentTimeMillis(), // we wanna know FPS
-				start_sound = start_frame, // we wanna synchronize...
-				start_cycle, stop_cycle;
+		int frames = 0, fps = 50, waitCycle, idle = 0;
+		long startFrame = System.currentTimeMillis(), // we wanna know FPS
+				startSound = startFrame, // we wanna synchronize...
+				startCycle, stopCycle;
 
 		lv.pk.clock = 0;
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		while (ireq == 0 && !lv.pk.cpu_halt_state) {
-			start_cycle = System.currentTimeMillis();
-			lv.update_image();
+		while (ireq == 0 && !lv.pk.cpuHaltState) {
+			startCycle = System.currentTimeMillis();
+			lv.updateImage();
 			frames++;
 			lv.emulate(ticks);
-			stop_cycle = System.currentTimeMillis();
-			wait_cycle = (int) (stop_cycle - start_cycle);
+			stopCycle = System.currentTimeMillis();
+			waitCycle = (int) (stopCycle - startCycle);
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			if ((stop_cycle - start_frame) > 1000) {
-				print_this(lv.printed());
+			if ((stopCycle - startFrame) > 1000) {
+				printThis(lv.printed());
 				fps = frames;
 				if (fps < 1)
 					fps = 1;
 				showStatus("FPS: " + fps + " // Speed: " + frames * 2 + "%" + " // Idle: " + idle / 10 + "%");
 				idle = frames = 0;
-				start_frame = stop_cycle;
-				stop_cycle = System.currentTimeMillis();
-				wait_cycle = (int) (stop_cycle - start_cycle);
+				startFrame = stopCycle;
+				stopCycle = System.currentTimeMillis();
+				waitCycle = (int) (stopCycle - startCycle);
 			}
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			if (speak_slow) // synchronize every 1/5 of second
+			if (speakSlow) // synchronize every 1/5 of second
 			{
-				if ((stop_cycle - start_sound) > 200) {
-					if (go_sound)
-						Sound.play(speak_mode, 200, volume_down, volume_up, lv.speaked());
+				if ((stopCycle - startSound) > 200) {
+					if (goSound)
+						Sound.play(speakMode, 200, volumeDown, volumeUp, lv.speaked());
 					lv.pk.clock = 0;
-					start_sound = stop_cycle;
-					stop_cycle = System.currentTimeMillis();
-					wait_cycle = (int) (stop_cycle - start_cycle);
+					startSound = stopCycle;
+					stopCycle = System.currentTimeMillis();
+					waitCycle = (int) (stopCycle - startCycle);
 				}
 			} else // each rendering cycle (i.e. 1/50 of second)
 			{
-				if (go_sound)
-					Sound.play(speak_mode, 20, volume_down, volume_up, lv.speaked());
+				if (goSound)
+					Sound.play(speakMode, 20, volumeDown, volumeUp, lv.speaked());
 
 				lv.pk.clock = 0;
-				start_sound = stop_cycle;
-				stop_cycle = System.currentTimeMillis();
-				wait_cycle = (int) (stop_cycle - start_cycle);
+				startSound = stopCycle;
+				stopCycle = System.currentTimeMillis();
+				waitCycle = (int) (stopCycle - startCycle);
 			}
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			if (wait_cycle >= 20)
-				wait_cycle = 1;
+			if (waitCycle >= 20)
+				waitCycle = 1;
 			else
-				wait_cycle = 20 - wait_cycle;
-			if (!go_fast) {
-				idle += wait_cycle;
+				waitCycle = 20 - waitCycle;
+			if (!goFast) {
+				idle += waitCycle;
 				try {
-					Thread.sleep(wait_cycle);
+					Thread.sleep(waitCycle);
 				} catch (InterruptedException Ex) {
 				}
 			}
@@ -179,7 +179,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 
 	// -----------------------------------------------------------------------------
 	public void start() {
-		if (init_failed != null)
+		if (initFailed != null)
 			return;
 		lv.requestFocusInWindow();
 		if (framer == null)
@@ -189,10 +189,10 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 	}
 
 	public void stop() {
-		if (init_failed != null)
+		if (initFailed != null)
 			return;
 		else
-			ireq = cmStop;
+			ireq = CM_STOP;
 		for (;;)
 			try {
 				framer.join();
@@ -240,19 +240,19 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 			ticks = Integer.parseInt(cfg("CpuTicks"));
 			
 			lv = new PK01(mode);
-			go_fast = !cfg("Sync", "yes");
-			lv.pk.halt_if_invalid = cfg("HALT_ON_INVALID", "yes");
+			goFast = !cfg("Sync", "yes");
+			lv.pk.haltIfInvalid = cfg("HaltOnInvalid", "yes");
 
-			speak_mode = Integer.parseInt(cfg("SpeakMode"));
-			speak_slow = cfg("SpeakSlow", "yes");
+			speakMode = Integer.parseInt(cfg("SpeakMode"));
+			speakSlow = cfg("SpeakSlow", "yes");
 			int volume = Integer.parseInt(cfg("Speaker"));
-			if (go_sound = (volume >= 0)) {
+			if (goSound = (volume >= 0)) {
 				Sound.init();
-				set_volume(volume);
+				setVolume(volume);
 			}
 
 			if (!cfg("Printer", "<none>"))
-				if (!open_printer(cfg("Printer")))
+				if (!openPrinter(cfg("Printer")))
 					throw new Exception("Unable to open printer !");
 
 			boolean bBoot = false, bBootCold = false;
@@ -276,13 +276,13 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 				nBoot = cfg("BiosFile"); // First from file system
 				try {
 					sBoot = new FileInputStream(nBoot);
-					lv.load_bios(Utils.ZIP(nBoot, sBoot));
+					lv.loadBios(Utils.ZIP(nBoot, sBoot));
 					sBoot.close();
 				} catch (Exception ex1) // If failed then from ".JAR"
 				{
 					try {
 						sBoot = getClass().getResourceAsStream(nBoot);
-						lv.load_bios(Utils.ZIP(nBoot, sBoot));
+						lv.loadBios(Utils.ZIP(nBoot, sBoot));
 						sBoot.close();
 					} catch (Exception ex2) // We ignoring ex2 cause second
 					{ // loading attempt is less important than the first one
@@ -291,16 +291,16 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 				}
 			}
 			if (bBootCold)
-				lv.cold_start();
+				lv.coldStart();
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-			Set<String> e = Keyboard.as_int.keySet();
+			Set<String> e = Keyboard.asInt.keySet();
 			for (String n : e) {
-				Integer vk = (Integer) Keyboard.as_int.get(n);
+				Integer vk = (Integer) Keyboard.asInt.get(n);
 				String s = cfg(n);
 				if (!s.equals("")) {
 					s = new StringTokenizer(s).nextToken();
-					lv.set_kb(vk.intValue(), Integer.parseInt(s, 16));
+					lv.setKb(vk.intValue(), Integer.parseInt(s, 16));
 				}
 			}
 
@@ -317,20 +317,20 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 				setSize(fly.preferredLayoutSize(this));
 			}
 			
-			ireq = cmRepaint;
+			ireq = CM_REPAINT;
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		} catch (Exception ex) {
 			if (lv != null)
 				remove(lv);
-			add(new JLabel(init_failed = ex.toString()), BorderLayout.CENTER);
+			add(new JLabel(initFailed = ex.toString()), BorderLayout.CENTER);
 		}
 	}
 
 	// -----------------------------------------------------------------------------
 	public void destroy() {
 		Sound.done();
-		close_printer();
+		closePrinter();
 	}
 
 	abstract void showStatus(String status);

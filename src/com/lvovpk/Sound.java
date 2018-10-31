@@ -38,37 +38,37 @@ public class Sound {
 	}
 
 	// -----------------------------------------------------------------------------
-	public static void play(int mode, int rtime, byte vol_dn, byte vol_up, long[] etime) {
+	public static void play(int mode, int rtime, byte volDn, byte volUp, long[] etime) {
 		if (etime == null || etime.length - 1 == 0) {
 			line.stop();
 			return;
 		}
 		switch (mode) {
 		case 1:
-			enqueue(play1(rtime, vol_dn, vol_up, etime));
+			enqueue(play1(rtime, volDn, volUp, etime));
 			break;
 		default:
 		case 2:
-			enqueue(play2(rtime, vol_dn, vol_up, etime));
+			enqueue(play2(rtime, volDn, volUp, etime));
 			break;
 		}
 	}
 
 	// -----------------------------------------------------------------------------
-	private static byte[] play1(int rtime, byte vol_dn, byte vol_up, long[] etime) {
+	private static byte[] play1(int rtime, byte volDn, byte volUp, long[] etime) {
 		int pad = rtime * 8000 / 1000; // num of speaks per supplied data
 		byte data[] = new byte[pad];
 
 		long et = 0;
 		for (int i = 0, j = 0; i < pad; i++) {
 			et += 1000000 / 8000; // calculate emulator time
-			data[i] = vol_dn;
+			data[i] = volDn;
 			if (etime == null)
 				continue;
 			if (j >= etime.length - 1)
 				continue;
 			if (et > etime[j]) {
-				data[i] = vol_up;
+				data[i] = volUp;
 				j++;
 			}
 		}
@@ -76,7 +76,7 @@ public class Sound {
 	}
 
 	// -----------------------------------------------------------------------------
-	private static byte[] play2(int rtime, byte vol_dn, byte vol_up, long[] etime) {
+	private static byte[] play2(int rtime, byte volDn, byte volUp, long[] etime) {
 		int pad = rtime * 8000 / 1000; // num of speaks per supplied data
 		byte data[] = new byte[pad];
 		int times, hits;
@@ -90,11 +90,11 @@ public class Sound {
 		do {
 			if (j >= times)
 				while (i < pad)
-					data[i++] = vol_dn;
+					data[i++] = volDn;
 			else {
 				hits = (int) ((etime[j] - prev) * 8 / 1000) + 1;
 				for (int k = 1; k <= hits && i < pad; k++, i++)
-					data[i] = (byte) (k * (vol_up - vol_dn) / hits + vol_dn);
+					data[i] = (byte) (k * (volUp - volDn) / hits + volDn);
 				prev = etime[j++];
 			}
 		} while (i < pad);
