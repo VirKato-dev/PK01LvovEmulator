@@ -24,7 +24,7 @@ Run with:
 For keyboard layout reference see the [keyboard.png](docs/images/keyboard.png?raw=true) file.
 
 External programs or games (*.LVT files) can be loaded using "Load program" from the menu.
-You can also import a BASIC program (like [sample.bas](docs/sample.bas?raw=true)), edit it in internal editor and run it by typing "RUN" (or just by pressing NumLock).
+You can also import a BASIC program (like [example.bas](docs/example.bas?raw=true)), edit it in internal editor and run it by typing "RUN" (or just by pressing NumLock).
 
 The emulator is distributed under the terms of GNU General Public License version 2.
 
@@ -52,6 +52,6 @@ The emulator is distributed under the terms of GNU General Public License versio
 Раскладка клавиатуры указана в файле [keyboard.png](docs/images/keyboard.png?raw=true).
 
 Внешние программы или игры (*.LVT файлы) можно загрузить с помощью "Load program" из меню.
-Также можно импортировать программу на BASIC (например, [sample.bas](docs/sample.bas?raw=true)), отредактировать ее во внутреннем редакторе и запустить, набрав "RUN" (или просто нажав NumLock).
+Также можно импортировать программу на BASIC (например, [example.bas](docs/example.bas?raw=true)), отредактировать ее во внутреннем редакторе и запустить, набрав "RUN" (или просто нажав NumLock).
 
 Эмулятор распространяется на условиях GNU General Public License version 2.
