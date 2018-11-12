@@ -11,9 +11,7 @@ The emulator is written in Java and based on the work of Hard Wisdom (Vladimir K
 
 Screenshot:
 
-<p align="center">
 ![Screenshot of the Emulator](docs/images/screenshot.png?raw=true)
-</p>
 
 Build with:
 
