@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
+import javax.swing.UIManager;
+
 /**
  * Entry Point to Lvov Emulator
  */
@@ -50,6 +52,12 @@ public class EmulatorMain extends EmulatorUI {
 	// I n i t i a l i z a t i o n
 	// -----------------------------------------------------------------------------
 	public static void main(String[] args) throws Exception {
+		if (System.getProperty("swing.defaultlaf") == null) {
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception ex) {
+			}
+		}
 		try {
 			EmulatorMain em = new EmulatorMain();
 			if (args.length <= 0 || args[0].equals("-r") || !args[0].startsWith("-")) {
@@ -94,14 +102,17 @@ public class EmulatorMain extends EmulatorUI {
 
 			// -----------------------------------------------------------------------------
 			else {
-				System.out.println("USAGE: PK01LvovEmulator.jar -d <conf_file> to dump default configurations\n"
-						+ "                  -r <conf_file> to replace default configurations\n"
-						+ "                  -p <basic_file> to produce basic .lvt from textual stdin\n"
-						+ "                     -p866 -p1251 -pkoi8 allows you to specify codepage,\n"
-						+ "                     -p just uses default and it isn't good on wintel\n"
-						+ "                  -v <basic_file> to list/view basic .lvt onto textual stdout\n"
-						+ "                     -v866 -v1251 -vkoi8 allows you to specify codepage\n");
-				throw new Exception("Unrecognized Command Line");
+				System.out.println("USAGE: PK01LvovEmulator.jar -d <conf_file> to dump default configurations" + PKIO.NL
+						+ "                  -r <conf_file> to replace default configurations" + PKIO.NL
+						+ "                  -p <basic_file> to produce basic .lvt from textual stdin" + PKIO.NL
+						+ "                     -p866 -p1251 -pkoi8 allows you to specify codepage," + PKIO.NL
+						+ "                     -p just uses default and it isn't good on wintel" + PKIO.NL
+						+ "                  -v <basic_file> to list/view basic .lvt onto textual stdout" + PKIO.NL
+						+ "                     -v866 -v1251 -vkoi8 allows you to specify codepage" + PKIO.NL
+						+ "                  -h show this information" + PKIO.NL);
+				if (!args[0].equals("-h")) {
+					throw new Exception("Unrecognized Command Line");
+				}
 			}
 
 			// -----------------------------------------------------------------------------

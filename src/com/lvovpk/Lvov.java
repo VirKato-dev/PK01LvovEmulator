@@ -31,7 +31,7 @@ class Lvov extends I8080 {
 			boolean strobe = (C2 & 4) != 0;
 			if (printer != null && strobe && printed < printer.length) {
 				printer[printed++] = (byte) (ports[0xC0] ^ 0xFF);
-				return strobe ? (C2 | 0x40) : (C2 & 0xBF);
+				return (C2 | 0x40); // strobe ? (C2 | 0x40) : (C2 & 0xBF);
 			}
 			return C2;
 

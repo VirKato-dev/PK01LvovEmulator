@@ -171,7 +171,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 				idle += waitCycle;
 				try {
 					Thread.sleep(waitCycle);
-				} catch (InterruptedException Ex) {
+				} catch (InterruptedException ex) {
 				}
 			}
 		}
@@ -229,7 +229,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 					setExtendedState(JFrame.MAXIMIZED_BOTH); 
 					setUndecorated(true);
 				}
-				catch(Exception e) {
+				catch (Exception ex) {
 					fullScreen = false;
 				}
 			}
@@ -247,7 +247,13 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 			speakSlow = cfg("SpeakSlow", "yes");
 			int volume = Integer.parseInt(cfg("Speaker"));
 			if (goSound = (volume >= 0)) {
-				Sound.init();
+				try {
+					Sound.init();
+				}
+				catch (Exception ex) {
+					writeLog("Sound initialization failed: " + ex.getMessage());
+					ex.printStackTrace();
+				}
 				setVolume(volume);
 			}
 
@@ -334,5 +340,6 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 	}
 
 	abstract void showStatus(String status);
+	abstract void writeLog(String msg);
 	// -----------------------------------------------------------------------------
 }

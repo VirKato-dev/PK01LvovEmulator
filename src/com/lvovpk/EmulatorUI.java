@@ -50,21 +50,20 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	static final int CM_INVOKE_LOG = 25;
 	static final int CM_CHANGE_TICKS = 26;
 	static final int CM_VOL_CTL = 1000;
-	
-	static final int MENU_SHORTCUT_KEY_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
 	private JPopupMenu pm = null;
 	private EditorWindow tx;
 	private DebuggerWindow dbg;
 	private LogWindow log;
 	private JLabel st = null;
-	
+
 	private String configFileName = null;
 	private String currentDir = null;
 
 	public final void doConfigDump(String name) {
+		// save default configuration
 		configDump(name);
-	} // save default configuration
+	}
 
 	// -----------------------------------------------------------------------------
 	void configDump(String tf) {
@@ -233,8 +232,8 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		mkToolbarButton(tb, name, "Ticks", CM_CHANGE_TICKS, "Ticks");
 		mkToolbarButton(tb, name, "Fast", CM_FAST, "Fast");
 		mkToolbarButton(tb, name, "Slow", CM_SLOW, "Slow");
-		mkToolbarButton(tb, name, "PRN_O", CM_OPEN_PRN, "oPRN");
-		mkToolbarButton(tb, name, "PRN_C", CM_CLOSE_PRN, "cPRN");
+		mkToolbarButton(tb, name, "PRN_O", CM_OPEN_PRN, "O-Printer");
+		mkToolbarButton(tb, name, "PRN_C", CM_CLOSE_PRN, "C-Printer");
 
 		mkToolbarButton(tb, name, "Speaker", CM_VOL_CTL + 0, "Mute");
 		mkToolbarButton(tb, name, "Speaker", CM_VOL_CTL + 100, "Loud");
@@ -317,16 +316,15 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		tx.setPeer(CM_SYNC_EDITOR_IN, CM_SYNC_EDITOR_OUT, this);
 		dbg = new DebuggerWindow(this, "Simple i8080 Debugger (press F1 for help)", true, new LvovDebugger(lv));
 		Keyboard.enableShortcuts = cfg("KeyboardShortcuts", "yes");
+		Keyboard.shortcutsModifiers = (cfg("KeyboardShortcutsModifiers").isEmpty() ?
+				KeyEvent.CTRL_DOWN_MASK : Integer.valueOf(cfg("KeyboardShortcutsModifiers")));
 		if (Keyboard.enableShortcuts && (fullScreen || !cfg("Enable_ToolbarMenu", "yes"))) {
 			lv.addKeyListener(this);
 		}
 		
 		if (!fullScreen) {
 			JToolBar tb;
-			FlowLayout tbl = new FlowLayout();
-			tbl.setHgap(0);
-			tbl.setVgap(0);
-			tbl.setAlignment(FlowLayout.LEFT);
+			FlowLayout tbl = new FlowLayout(FlowLayout.LEFT, 0, 0);
 			
 			if (cfg("Enable_ToolbarTop", "yes")) {
 				JPanel topPanel = new JPanel();
@@ -354,7 +352,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 				}
 				
 				if (cfg("Enable_Statusbar", "yes")) {
-					JPanel stb = new JPanel(tbl);
+					JPanel stb = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
 					stb.add(st = new JLabel("Booting..."));
 					stb.setAlignmentX(Component.LEFT_ALIGNMENT);
 					bottomPanel.add(stb);
@@ -623,7 +621,9 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	private void showAboutDialog() {
 		JOptionPane.showMessageDialog(this,
 				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.2\n"
-						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n" + "(c) 2018 by Izhak Serovsky \n\n"
+						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n"
+						+ "(c) 2018 by Izhak Serovsky \n"
+						+ "Run with -h switch to view the available command-line options\n\n"
 						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
 						+ "The emulator is distributed under the GNU General Public License version 2");
 	}

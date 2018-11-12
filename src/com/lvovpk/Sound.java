@@ -10,20 +10,18 @@ import javax.sound.sampled.SourceDataLine;
  */
 public class Sound {
 
-	private static SourceDataLine line;
+	private static SourceDataLine line = null;
 
 	// -----------------------------------------------------------------------------
-	public static void init() {
-		try {
-			AudioFormat format = new AudioFormat(8000f, 8, 1, false, false);
-			line = AudioSystem.getSourceDataLine(format);
-			line.open(format);
-		} catch (LineUnavailableException e) {
-			e.printStackTrace();
-		}
+	public static void init() throws LineUnavailableException {
+		AudioFormat format = new AudioFormat(8000f, 8, 1, false, false);
+		line = AudioSystem.getSourceDataLine(format);
+		line.open(format);
 	}
 
 	public static void done() {
+		if (line == null || !line.isOpen())
+			return;
 		line.stop();
 		line.close();
 	}
@@ -39,6 +37,8 @@ public class Sound {
 
 	// -----------------------------------------------------------------------------
 	public static void play(int mode, int rtime, byte volDn, byte volUp, long[] etime) {
+		if (line == null || !line.isOpen())
+			return;
 		if (etime == null || etime.length - 1 == 0) {
 			line.stop();
 			return;

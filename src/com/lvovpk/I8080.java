@@ -1262,7 +1262,7 @@ abstract class I8080 {
 				rPC += 1;
 				break;
 			case 0xA7: // A7 ANA A
-				rF = flags[rA &= rA] | (rF & F_A);
+				rF = flags[rA /* &= rA */] | (rF & F_A);
 				clock += 4;
 				rPC += 1;
 				break;
@@ -1344,7 +1344,7 @@ abstract class I8080 {
 				rPC += 1;
 				break;
 			case 0xB7: // B7 ORA A
-				rF = flags[rA |= rA] | (rF & F_A);
+				rF = flags[rA /* |= rA */] | (rF & F_A);
 				clock += 4;
 				rPC += 1;
 				break;

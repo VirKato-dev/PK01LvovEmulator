@@ -46,11 +46,6 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 	int ireq3;
 
 	// -----------------------------------------------------------------------------
-	// U t i l i t y
-	// -----------------------------------------------------------------------------
-	abstract void writeLog(String msg);
-
-	// -----------------------------------------------------------------------------
 	// I n t e r f a c e
 	// -----------------------------------------------------------------------------
 	public final void doChangeMode() {
@@ -440,7 +435,7 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 				while (ireq == CM_PAUSE)
 					try {
 						Thread.sleep(1000);
-					} catch (Exception Ex) {
+					} catch (InterruptedException ex) {
 					}
 				break;
 			}

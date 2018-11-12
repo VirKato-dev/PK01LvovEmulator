@@ -1,5 +1,6 @@
 package com.lvovpk;
 
+import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,6 +27,8 @@ class Defaults {
 		cfg.put("CpuTicks", "25000"); // Cause 2.5MHz and 50 Fps
 		cfg.put("FullScreen", "No");
 		cfg.put("KeyboardShortcuts", "Yes");
+		cfg.put("KeyboardShortcutsModifiers", String.valueOf(KeyEvent.CTRL_DOWN_MASK));
+		// Can be a combination, like: KeyEvent.CTRL_DOWN_MASK | KeyEvent.ALT_DOWN_MASK
 
 		// -----------------------------------------------------------------------------
 		// Keyboard

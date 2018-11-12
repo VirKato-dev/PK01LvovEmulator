@@ -72,17 +72,17 @@ abstract class PK00 extends Canvas implements KeyListener {
 
 	// -----------------------------------------------------------------------------
 	public void clrKb(int vk) {
-		keyMask.remove(new Integer(vk));
+		keyMask.remove(Integer.valueOf(vk));
 	}
 
 	public void setKb(int vk, int mask) {
-		keyMask.put(new Integer(vk), new Integer(mask));
+		keyMask.put(Integer.valueOf(vk), Integer.valueOf(mask));
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
 	public void keyPressed(KeyEvent e) {
-		Integer mask = (Integer) keyMask.get(new Integer(e.getKeyCode()));
+		Integer mask = (Integer) keyMask.get(Integer.valueOf(e.getKeyCode()));
 		if (mask != null)
 			kbd(mask.intValue(), true);
 	}
@@ -90,7 +90,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// -----------------------------------------------------------------------------
 	@Override
 	public void keyReleased(KeyEvent e) {
-		Integer mask = (Integer) keyMask.get(new Integer(e.getKeyCode()));
+		Integer mask = (Integer) keyMask.get(Integer.valueOf(e.getKeyCode()));
 		if (mask != null)
 			kbd(mask.intValue(), false);
 	}
