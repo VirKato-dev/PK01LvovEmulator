@@ -11,7 +11,7 @@ The emulator is written in Java and based on the work of Hard Wisdom (Vladimir K
 
 Screenshot:
 
-![Screenshot of the Emulator](docs/images/screenshot.png?raw=true)
+![PK-01 Lvov Emulator screenshot](docs/images/screenshot.png?raw=true)
 
 Build with:
 
@@ -52,6 +52,6 @@ The emulator is distributed under the terms of GNU General Public License versio
 Раскладка клавиатуры указана в файле [keyboard.png](docs/images/keyboard.png?raw=true).
 
 Внешние программы или игры (*.LVT файлы) можно загрузить с помощью "Load program" из меню.
-Также можно импортировать программу на BASIC (например, [example.bas](docs/example.bas?raw=true)), отредактировать ее во внутреннем редакторе и запустить, набрав "RUN" (или просто нажав NumLock).
+Также можно импортировать программу на BASIC (например, [example.bas](docs/example.bas?raw=true)), отредактировать её во внутреннем редакторе и запустить, набрав "RUN" (или просто нажав NumLock).
 
 Эмулятор распространяется на условиях GNU General Public License version 2.
