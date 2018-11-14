@@ -623,7 +623,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.2\n"
 						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n"
 						+ "(c) 2018 by Izhak Serovsky \n"
-						+ "Run with -h switch to view the available command-line options\n\n"
+						+ "Run with the -h switch to view the available command-line options\n\n"
 						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
 						+ "The emulator is distributed under the GNU General Public License version 2");
 	}
