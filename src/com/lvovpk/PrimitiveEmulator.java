@@ -199,12 +199,9 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 				break;
 			} catch (InterruptedException ex) {
 			}
-		// try {framer.join();} catch (InterruptedException ex) {} // only one
-		// attempt
+		// try {framer.join();} catch (InterruptedException ex) {} // only one attempt
 	}
 
-	// -----------------------------------------------------------------------------
-	// N a t i v e B r o w s e r I n i t i a l i z a t i o n
 	// -----------------------------------------------------------------------------
 	String cfg(String nm) {
 		String s = (String) Defaults.cfg.get(nm);
@@ -279,7 +276,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			if (bBoot) // Depending on type of dump may need to load BIOS
 			{
-				nBoot = cfg("BiosFile"); // First from file system
+				nBoot = cfg("BiosFile"); // First from the file system
 				try {
 					sBoot = new FileInputStream(nBoot);
 					lv.loadBios(Utils.ZIP(nBoot, sBoot));
@@ -290,8 +287,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 						sBoot = getClass().getResourceAsStream(nBoot);
 						lv.loadBios(Utils.ZIP(nBoot, sBoot));
 						sBoot.close();
-					} catch (Exception ex2) // We ignoring ex2 cause second
-					{ // loading attempt is less important than the first one
+					} catch (Exception ex2) {
 						throw new Exception("Can't load BIOS: " + ex1);
 					}
 				}

@@ -43,15 +43,10 @@ public class Sound {
 			line.stop();
 			return;
 		}
-		switch (mode) {
-		case 1:
+		if (mode == 1)
 			enqueue(play1(rtime, volDn, volUp, etime));
-			break;
-		default:
-		case 2:
+		else
 			enqueue(play2(rtime, volDn, volUp, etime));
-			break;
-		}
 	}
 
 	// -----------------------------------------------------------------------------

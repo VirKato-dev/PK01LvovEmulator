@@ -76,7 +76,6 @@ class PK01 extends PK00 {
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	// - -
 	private int getVar(int var) {
 		return pk.memory[var] + pk.memory[var + 1] * 256;
 	}

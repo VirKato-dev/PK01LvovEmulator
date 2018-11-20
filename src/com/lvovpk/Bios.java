@@ -14,13 +14,12 @@ class Bios {
 
 	final static int BASIC_STACK = 0xAFC1;
 
-	// This is the hot-restart entry for the any Basic _command_
+	// This is the hot-restart entry for any Basic _command_
 
 	final static int BASIC_HOT_ENTRY = 0x02FD;
 
 	// This is the Basic variable that contains the beginning of
-	// the Basic program being loaded (value may grows after ran of
-	// plugins, I know some of them)
+	// the Basic program being loaded
 
 	final static int BASIC_PROG_BEGIN = 0x0243;
 
