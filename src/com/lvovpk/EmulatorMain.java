@@ -60,7 +60,7 @@ public class EmulatorMain extends EmulatorUI {
 		}
 		try {
 			EmulatorMain em = new EmulatorMain();
-			if (args.length <= 0 || args[0].equals("-r") || !args[0].startsWith("-")) {
+			if (args.length == 0 || args[0].equals("-r") || !args[0].startsWith("-")) {
 
 				if (args.length > 1 && args[0].equals("-r")) {
 					em.setConfigFileName(args[1]);
@@ -111,16 +111,14 @@ public class EmulatorMain extends EmulatorUI {
 						+ "                     -v866 -v1251 -vkoi8 allows you to specify codepage" + PKIO.NL
 						+ "                  -h show this information" + PKIO.NL);
 				if (!args[0].equals("-h")) {
-					throw new Exception("Unrecognized Command Line");
+					throw new Exception("Unrecognized command line option");
 				}
 			}
 
 			// -----------------------------------------------------------------------------
 		} catch (Exception ex) {
-			System.out.println("Unhappy exception happened :-(");
 			ex.printStackTrace();
-			System.err.println("---");
-			throw ex; // System.exit(0);
+			System.exit(1);
 		}
 	}
 
