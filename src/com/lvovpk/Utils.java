@@ -51,24 +51,12 @@ public class Utils {
 	// F o r m a t t i n g
 	// -----------------------------------------------------------------------------
 	public static String padRight(String s, int w) {
-		return padRight(s, w, " ");
-	}
-
-	public static String padRight(String s, int w, String pad) {
-		while (s.length() < w)
-			s = s + pad;
-		return s.substring(0, w);
+		return String.format("%1$-" + w + "s", s);
 	}
 
 	// -----------------------------------------------------------------------------
 	public static String padLeft(String s, int w) {
-		return padLeft(s, w, " ");
-	}
-
-	public static String padLeft(String s, int w, String pad) {
-		while (s.length() < w)
-			s = pad + s;
-		return s.substring(s.length() - w, s.length());
+		return String.format("%1$" + w + "s", s);
 	}
 
 	// -----------------------------------------------------------------------------
