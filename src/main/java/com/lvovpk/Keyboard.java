@@ -18,6 +18,7 @@ class Keyboard {
 
 	private static final int[][] SHORTCUTS = {
 			{ KeyEvent.VK_M,      1, EmulatorUI.CM_MODE },
+			{ KeyEvent.VK_F,      1, EmulatorUI.CM_TOGGLE_FULLSCREEN },
 			{ KeyEvent.VK_L,      1, EmulatorUI.CM_LOAD },
 			{ KeyEvent.VK_R,      1, EmulatorUI.CM_RESET },
 			{ KeyEvent.VK_P,      1, EmulatorUI.CM_PAUSE },

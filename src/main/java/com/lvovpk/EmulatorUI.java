@@ -3,6 +3,8 @@ package com.lvovpk;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -22,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -49,9 +52,12 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	static final int CM_INVOKE_ABOUT = 24;
 	static final int CM_INVOKE_LOG = 25;
 	static final int CM_CHANGE_TICKS = 26;
+	static final int CM_TOGGLE_FULLSCREEN = 27;
 	static final int CM_VOL_CTL = 1000;
 
-	private JPopupMenu pm = null;
+	private JPanel topPanel = null;
+	private JPanel bottomPanel = null;
+	private JPopupMenu popupMenu = null;
 	private EditorWindow tx;
 	private DebuggerWindow dbg;
 	private LogWindow log;
@@ -68,7 +74,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	// -----------------------------------------------------------------------------
 	void configDump(String tf) {
 		try {
-			String k[];
+			String[] k;
 			PrintWriter o = new PrintWriter(new FileOutputStream(tf));
 			o.println("#main");
 			o.println("appv.size.x " + getSize().width);
@@ -78,13 +84,13 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			o.println("#OSD Settings");
 			k = Utils.sort(config.keySet(), true);
 			for (int i = 0; i < k.length; i++)
-				o.println(Utils.padRight(k[i], 40) + config.get(k[i]).toString());
+				o.println(Utils.padRight(k[i], 40) + config.get(k[i]));
 			o.println("");
 
 			o.println("#LVOV Settings");
 			k = Utils.sort(Defaults.cfg.keySet(), true);
 			for (int i = 0; i < k.length; i++)
-				o.println(Utils.padRight(k[i], 40) + Defaults.cfg.get(k[i]).toString());
+				o.println(Utils.padRight(k[i], 40) + Defaults.cfg.get(k[i]));
 			o.println("");
 
 			o.close();
@@ -129,7 +135,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	String cfg(String nm) {
 		String s = super.cfg(nm);
 		if (s.equals(""))
-			s = (String) config.get(nm);
+			s = config.get(nm);
 		if (s == null)
 			return "";
 		else
@@ -141,14 +147,15 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	static {
 		config = new ConcurrentHashMap<String, String>();
 
-		String menus[][] = new String[][] {
+		String[][] menus = new String[][] {
 			{ "ToolbarTop", "No" },
 			{ "ToolbarBottom", "No" },
 			{ "ToolbarMenu", "Yes" },
 			{ "ContextMenu", "No" }
 		};
-		String features[][] = new String[][] {
+		String[][] features = new String[][] {
 			{ "Mode", "No", "Yes", "Yes", "Yes" },
+			{ "Fullscreen", "No", "Yes", "Yes", "Yes" },
 			{ "Fast", "No", "Yes", "Yes", "Yes" },
 			{ "Slow", "No", "Yes", "Yes", "Yes" },
 			{ "Ticks", "No", "Yes", "Yes", "Yes" },
@@ -235,7 +242,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		mkToolbarButton(tb, name, "PRN_O", CM_OPEN_PRN, "O-Printer");
 		mkToolbarButton(tb, name, "PRN_C", CM_CLOSE_PRN, "C-Printer");
 
-		mkToolbarButton(tb, name, "Speaker", CM_VOL_CTL + 0, "Mute");
+		mkToolbarButton(tb, name, "Speaker", CM_VOL_CTL, "Mute");
 		mkToolbarButton(tb, name, "Speaker", CM_VOL_CTL + 100, "Loud");
 
 		mkToolbarButton(tb, name, "Reset", CM_RESET, "Reset");
@@ -265,6 +272,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 		submn = new JMenu("Config");
 		mkMenuItem(submn, name, "Mode", CM_MODE, "Change rendering mode");
+		mkMenuItem(submn, name, "Fullscreen", CM_TOGGLE_FULLSCREEN, "Toggle Fullscreen");
 		mkMenuItem(submn, name, "Ticks", CM_CHANGE_TICKS, "Change CPU Clock Ticks");
 		mkMenuItem(submn, name, "Fast", CM_FAST, "Emulate at full speed");
 		mkMenuItem(submn, name, "Slow", CM_SLOW, "Emulate at real speed");
@@ -317,7 +325,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		dbg = new DebuggerWindow(this, "Simple i8080 Debugger (press F1 for help)", true, new LvovDebugger(lv));
 		Keyboard.enableShortcuts = cfg("KeyboardShortcuts", "yes");
 		Keyboard.shortcutsModifiers = (cfg("KeyboardShortcutsModifiers").isEmpty() ?
-				KeyEvent.CTRL_DOWN_MASK : Integer.valueOf(cfg("KeyboardShortcutsModifiers")));
+				KeyEvent.CTRL_DOWN_MASK : Integer.parseInt(cfg("KeyboardShortcutsModifiers")));
 		if (Keyboard.enableShortcuts && (fullScreen || !cfg("Enable_ToolbarMenu", "yes"))) {
 			lv.addKeyListener(this);
 		}
@@ -325,9 +333,9 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		if (!fullScreen) {
 			JToolBar tb;
 			FlowLayout tbl = new FlowLayout(FlowLayout.LEFT, 0, 0);
-			
+
 			if (cfg("Enable_ToolbarTop", "yes")) {
-				JPanel topPanel = new JPanel();
+				topPanel = new JPanel();
 				topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 				tb = new JToolBar();
 				tb.setFloatable(false);
@@ -339,7 +347,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			}
 			
 			if (cfg("Enable_Statusbar", "yes") || cfg("Enable_ToolbarBottom", "yes")) {
-				JPanel bottomPanel = new JPanel();
+				bottomPanel = new JPanel();
 				bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
 				
 				if (cfg("Enable_ToolbarBottom", "yes")) {
@@ -360,27 +368,27 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 				add(bottomPanel, BorderLayout.SOUTH);
 			}
 			
-			if (cfg("Enable_ToolbarMenu", "yes")) {
-				JMenuBar mb = new JMenuBar();
-				mkMenu("ToolbarMenu", mb, false);
-				setJMenuBar(mb);
-			}
-			
 			setSize(getPreferredSize());
 			Toolkit tk = getToolkit();
 			setLocation((tk.getScreenSize().width - getSize().width) / 2,
 					(tk.getScreenSize().height - getSize().height) / 2);
 			setSize(fly.preferredLayoutSize(this));
 		}
+
+		if (cfg("Enable_ToolbarMenu", "yes")) {
+			JMenuBar menuBar = new JMenuBar();
+			mkMenu("ToolbarMenu", menuBar, false);
+			setJMenuBar(menuBar);
+		}
 		
 		if (cfg("Enable_ContextMenu", "yes")) {
-			pm = new JPopupMenu("Context");
-			pm.add(new JMenuItem("Focus on the emulator"));
+			popupMenu = new JPopupMenu("Context");
+			popupMenu.add(new JMenuItem("Focus on the emulator"));
 			boolean flat = cfg("Enable_FlatContextMenu", "yes");
 			if (!flat)
-				pm.addSeparator();
-			mkMenu("ContextMenu", pm, flat);
-			//add(pm);
+				popupMenu.addSeparator();
+			mkMenu("ContextMenu", popupMenu, flat);
+			//add(popupMenu);
 			lv.addMouseListener(this);
 		}
 		
@@ -427,8 +435,8 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (pm != null)
-			pm.show(lv, e.getX(), e.getY());
+		if (popupMenu != null)
+			popupMenu.show(lv, e.getX(), e.getY());
 	}
 
 	// -----------------------------------------------------------------------------
@@ -483,6 +491,9 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		case CM_MODE:
 			doChangeMode();
+			break;
+		case CM_TOGGLE_FULLSCREEN:
+			toggleFullScreen();
 			break;
 		case CM_CHANGE_TICKS:
 			doPause();
@@ -599,6 +610,40 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		this.configFileName = configFileName;
 	}
 
+	private void toggleFullScreen() {
+		fullScreen = !fullScreen;
+		if (topPanel != null)
+			topPanel.setVisible(!fullScreen);
+		if (bottomPanel != null)
+			bottomPanel.setVisible(!fullScreen);
+
+		setVisible(false);
+		removeNotify();
+		setUndecorated(fullScreen);
+		if (fullScreen) {
+			setExtendedState(JFrame.MAXIMIZED_BOTH);
+			remove(lv);
+			fly = new GridBagLayout();
+			setLayout(fly);
+			add(lv, new GridBagConstraints());
+
+			Toolkit tk = Toolkit.getDefaultToolkit();
+			setSize((int) tk.getScreenSize().getWidth(), (int) tk.getScreenSize().getHeight());
+			setLocation((tk.getScreenSize().width - getSize().width) / 2,
+					(tk.getScreenSize().height - getSize().height) / 2);
+		}
+		else {
+			setExtendedState(JFrame.NORMAL);
+			remove(lv);
+			fly = new BorderLayout(0, 0);
+			setLayout(fly);
+			add(lv, BorderLayout.CENTER);
+			setSize(fly.preferredLayoutSize(this));
+		}
+		addNotify();
+		setVisible(true);
+	}
+
 	private void showChangeTicksDialog() {
 		String ticksInput = JOptionPane.showInputDialog(this, "New value for CPU Clock Ticks:", ticks);
 		if (ticksInput != null) {
@@ -675,8 +720,12 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	// -----------------------------------------------------------------------------
 	@Override
 	public void destroy() {
-		if (cfg("Enable_ContextMenu", "yes") && pm != null)
-			remove(pm);
+		if (topPanel != null)
+			remove(topPanel);
+		if (bottomPanel != null)
+			remove(bottomPanel);
+		if (popupMenu != null)
+			remove(popupMenu);
 		if (cfg("Enable_ToolbarMenu", "yes"))
 			setMenuBar(null);
 		removeAll();
