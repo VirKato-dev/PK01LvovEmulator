@@ -15,7 +15,7 @@ class Defaults {
 	static {
 		cfg = new ConcurrentHashMap<String, String>();
 
-		cfg.put("BiosFile", "bios.gz");
+		cfg.put("BiosFile", "/bios.gz");
 		cfg.put("DumpFile", "boot.lvd");
 		cfg.put("HaltOnInvalid", "Yes");
 		cfg.put("Speaker", "80");

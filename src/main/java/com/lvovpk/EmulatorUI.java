@@ -622,7 +622,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		JOptionPane.showMessageDialog(this,
 				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.2\n"
 						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n"
-						+ "(c) 2018 by Izhak Serovsky \n"
+						+ "(c) 2019 by Izhak Serovsky \n"
 						+ "Run with the -h switch to view the available command-line options\n\n"
 						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
 						+ "The emulator is distributed under the GNU General Public License version 2");
@@ -647,7 +647,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		log = new LogWindow(this, "Events log", false);
 
 		try {
-			setIconImage(createImage((ImageProducer) getClass().getResource("pk01lvov.gif").getContent()));
+			setIconImage(createImage((ImageProducer) getClass().getResource("/pk01lvov.gif").getContent()));
 		} catch (IOException e) {
 		}
 
