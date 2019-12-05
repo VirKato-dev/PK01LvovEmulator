@@ -57,6 +57,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	private JPanel topPanel = null;
 	private JPanel bottomPanel = null;
+	private JMenuBar menuBar = null;
 	private JPopupMenu popupMenu = null;
 	private EditorWindow tx;
 	private DebuggerWindow dbg;
@@ -189,7 +190,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 				config.put("Enable_" + menus[i][0] + "_" + features[j][0] + "_Feature", features[j][i + 1]);
 		}
 	}
-	
+
 	// -----------------------------------------------------------------------------
 	private void mkMenuItem(JMenu mn, String name, String feature, int command, String description) {
 		if (cfg("Enable_" + name + "_" + feature + "_Feature", "yes")) {
@@ -317,9 +318,8 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	// -----------------------------------------------------------------------------
 	private void configure() {
-
 		addWindowListener(this);
-		
+
 		tx = new EditorWindow(this, "Simple Basic Editor", false);
 		tx.setPeer(CM_SYNC_EDITOR_IN, CM_SYNC_EDITOR_OUT, this);
 		dbg = new DebuggerWindow(this, "Simple i8080 Debugger (press F1 for help)", true, new LvovDebugger(lv));
@@ -329,58 +329,53 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		if (Keyboard.enableShortcuts && (fullScreen || !cfg("Enable_ToolbarMenu", "yes"))) {
 			lv.addKeyListener(this);
 		}
-		
-		if (!fullScreen) {
-			JToolBar tb;
-			FlowLayout tbl = new FlowLayout(FlowLayout.LEFT, 0, 0);
 
-			if (cfg("Enable_ToolbarTop", "yes")) {
-				topPanel = new JPanel();
-				topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+		JToolBar tb;
+		FlowLayout tbl = new FlowLayout(FlowLayout.LEFT, 0, 0);
+		if (cfg("Enable_ToolbarTop", "yes")) {
+			topPanel = new JPanel();
+			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+			tb = new JToolBar();
+			tb.setFloatable(false);
+			tb.setLayout(tbl);
+			tb.setAlignmentX(Component.LEFT_ALIGNMENT);
+			mkToolbar("ToolbarTop", tb);
+			topPanel.add(tb);
+			if (!fullScreen)
+				add(topPanel, BorderLayout.NORTH);
+		}
+
+		if (cfg("Enable_Statusbar", "yes") || cfg("Enable_ToolbarBottom", "yes")) {
+			bottomPanel = new JPanel();
+			bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+
+			if (cfg("Enable_ToolbarBottom", "yes")) {
 				tb = new JToolBar();
 				tb.setFloatable(false);
 				tb.setLayout(tbl);
 				tb.setAlignmentX(Component.LEFT_ALIGNMENT);
-				mkToolbar("ToolbarTop", tb);
-				topPanel.add(tb);
-				add(topPanel, BorderLayout.NORTH);
+				mkToolbar("ToolbarBottom", tb);
+				bottomPanel.add(tb);
 			}
-			
-			if (cfg("Enable_Statusbar", "yes") || cfg("Enable_ToolbarBottom", "yes")) {
-				bottomPanel = new JPanel();
-				bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
-				
-				if (cfg("Enable_ToolbarBottom", "yes")) {
-					tb = new JToolBar();
-					tb.setFloatable(false);
-					tb.setLayout(tbl);
-					tb.setAlignmentX(Component.LEFT_ALIGNMENT);
-					mkToolbar("ToolbarBottom", tb);
-					bottomPanel.add(tb);
-				}
-				
-				if (cfg("Enable_Statusbar", "yes")) {
-					JPanel stb = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
-					stb.add(st = new JLabel("Booting..."));
-					stb.setAlignmentX(Component.LEFT_ALIGNMENT);
-					bottomPanel.add(stb);
-				}
+
+			if (cfg("Enable_Statusbar", "yes")) {
+				JPanel stb = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+				stb.add(st = new JLabel("Booting..."));
+				stb.setAlignmentX(Component.LEFT_ALIGNMENT);
+				bottomPanel.add(stb);
+			}
+			if (!fullScreen)
 				add(bottomPanel, BorderLayout.SOUTH);
-			}
-			
-			setSize(getPreferredSize());
-			Toolkit tk = getToolkit();
-			setLocation((tk.getScreenSize().width - getSize().width) / 2,
-					(tk.getScreenSize().height - getSize().height) / 2);
-			setSize(fly.preferredLayoutSize(this));
 		}
 
 		if (cfg("Enable_ToolbarMenu", "yes")) {
-			JMenuBar menuBar = new JMenuBar();
+			menuBar = new JMenuBar();
 			mkMenu("ToolbarMenu", menuBar, false);
 			setJMenuBar(menuBar);
+			if (fullScreen)
+				menuBar.setVisible(false);
 		}
-		
+
 		if (cfg("Enable_ContextMenu", "yes")) {
 			popupMenu = new JPopupMenu("Context");
 			popupMenu.add(new JMenuItem("Focus on the emulator"));
@@ -390,6 +385,14 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			mkMenu("ContextMenu", popupMenu, flat);
 			//add(popupMenu);
 			lv.addMouseListener(this);
+		}
+
+		if (!fullScreen) {
+			setSize(getPreferredSize());
+			Toolkit tk = getToolkit();
+			setLocation((tk.getScreenSize().width - getSize().width) / 2,
+					(tk.getScreenSize().height - getSize().height) / 2);
+			setSize(fly.preferredLayoutSize(this));
 		}
 		
 		validate();
@@ -411,6 +414,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		int command = Keyboard.getCommandForShortcut(e);
 		if (command != 0) {
 			perform(command);
+			e.consume();
 		}
 	}
 
@@ -493,7 +497,9 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			doChangeMode();
 			break;
 		case CM_TOGGLE_FULLSCREEN:
+			doPause();
 			toggleFullScreen();
+			doResume();
 			break;
 		case CM_CHANGE_TICKS:
 			doPause();
@@ -612,25 +618,25 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	private void toggleFullScreen() {
 		fullScreen = !fullScreen;
-		if (topPanel != null)
-			topPanel.setVisible(!fullScreen);
-		if (bottomPanel != null)
-			bottomPanel.setVisible(!fullScreen);
-
+		if (menuBar != null)
+			menuBar.setVisible(!fullScreen);
 		setVisible(false);
 		removeNotify();
 		setUndecorated(fullScreen);
 		if (fullScreen) {
-			setExtendedState(JFrame.MAXIMIZED_BOTH);
+			if (topPanel != null)
+				remove(topPanel);
+			if (bottomPanel != null)
+				remove(bottomPanel);
 			remove(lv);
+			setExtendedState(JFrame.MAXIMIZED_BOTH);
 			fly = new GridBagLayout();
 			setLayout(fly);
 			add(lv, new GridBagConstraints());
 
 			Toolkit tk = Toolkit.getDefaultToolkit();
 			setSize((int) tk.getScreenSize().getWidth(), (int) tk.getScreenSize().getHeight());
-			setLocation((tk.getScreenSize().width - getSize().width) / 2,
-					(tk.getScreenSize().height - getSize().height) / 2);
+			setLocation(0, 0);
 		}
 		else {
 			setExtendedState(JFrame.NORMAL);
@@ -638,10 +644,26 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			fly = new BorderLayout(0, 0);
 			setLayout(fly);
 			add(lv, BorderLayout.CENTER);
+			if (topPanel != null)
+				add(topPanel, BorderLayout.NORTH);
+			if (bottomPanel != null)
+				add(bottomPanel, BorderLayout.SOUTH);
+
+			Toolkit tk = getToolkit();
 			setSize(fly.preferredLayoutSize(this));
+			pack();
+			setLocation((tk.getScreenSize().width - getSize().width) / 2,
+					(tk.getScreenSize().height - getSize().height) / 2);
 		}
 		addNotify();
 		setVisible(true);
+
+		if (Keyboard.enableShortcuts && menuBar != null) {
+			if (fullScreen)
+				lv.addKeyListener(this);
+			else
+				lv.removeKeyListener(this);
+		}
 	}
 
 	private void showChangeTicksDialog() {
@@ -672,7 +694,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
 						+ "The emulator is distributed under the GNU General Public License version 2");
 	}
-	
+
 	private String showFileDialog(boolean saveFile, String title, String... masks) {
 		File selectedFile = (saveFile ?
 				Utils.saveFileDialog(this, currentDir, title, masks) :
