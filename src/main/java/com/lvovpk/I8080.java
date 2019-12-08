@@ -86,7 +86,7 @@ abstract class I8080 {
 	}
 
 	// -----------------------------------------------------------------------------
-	private final boolean signalInvOpc() {
+	private boolean signalInvOpc() {
 		cpuHaltReason = HALT_OPC;
 		if (haltIfInvalid)
 			cpuHaltState = true;
@@ -94,11 +94,11 @@ abstract class I8080 {
 	}
 
 	// -----------------------------------------------------------------------------
-	private final void doWrite2(int aLo, int aHi, int bt) {
+	private void doWrite2(int aLo, int aHi, int bt) {
 		doWrite(aLo + (aHi << 8), bt);
 	}
 
-	private final int doRead2(int aLo, int aHi) {
+	private int doRead2(int aLo, int aHi) {
 		return doRead(aLo + (aHi << 8));
 	}
 

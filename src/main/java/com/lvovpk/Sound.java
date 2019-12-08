@@ -27,7 +27,7 @@ public class Sound {
 	}
 
 	// -----------------------------------------------------------------------------
-	private static void enqueue(byte data[]) {
+	private static void enqueue(byte[] data) {
 		// line.stop();
 		line.write(data, 0, data.length);
 		if (!line.isRunning()) {
@@ -52,7 +52,7 @@ public class Sound {
 	// -----------------------------------------------------------------------------
 	private static byte[] play1(int rtime, byte volDn, byte volUp, long[] etime) {
 		int pad = rtime * 8000 / 1000; // num of speaks per supplied data
-		byte data[] = new byte[pad];
+		byte[] data = new byte[pad];
 
 		long et = 0;
 		for (int i = 0, j = 0; i < pad; i++) {
@@ -73,7 +73,7 @@ public class Sound {
 	// -----------------------------------------------------------------------------
 	private static byte[] play2(int rtime, byte volDn, byte volUp, long[] etime) {
 		int pad = rtime * 8000 / 1000; // num of speaks per supplied data
-		byte data[] = new byte[pad];
+		byte[] data = new byte[pad];
 		int times, hits;
 
 		if (etime == null)

@@ -80,7 +80,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 		if (printerDevice != null && buffer != null)
 			try {
 				printerDevice.write(buffer);
-			} catch (Exception ex) {
+			} catch (Exception ignored) {
 			}
 	}
 
@@ -145,7 +145,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 			{
 				if ((stopCycle - startSound) > 200) {
 					if (goSound)
-						Sound.play(speakMode, 200, volumeDown, volumeUp, lv.speaked());
+						Sound.play(speakMode, 200, volumeDown, volumeUp, lv.spoken());
 					lv.pk.clock = 0;
 					startSound = stopCycle;
 					stopCycle = System.currentTimeMillis();
@@ -154,7 +154,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 			} else // each rendering cycle (i.e. 1/50 of second)
 			{
 				if (goSound)
-					Sound.play(speakMode, 20, volumeDown, volumeUp, lv.speaked());
+					Sound.play(speakMode, 20, volumeDown, volumeUp, lv.spoken());
 
 				lv.pk.clock = 0;
 				startSound = stopCycle;
@@ -171,7 +171,7 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 				idle += waitCycle;
 				try {
 					Thread.sleep(waitCycle);
-				} catch (InterruptedException ex) {
+				} catch (InterruptedException ignored) {
 				}
 			}
 		}
@@ -197,14 +197,14 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 			try {
 				framer.join();
 				break;
-			} catch (InterruptedException ex) {
+			} catch (InterruptedException ignored) {
 			}
 		// try {framer.join();} catch (InterruptedException ex) {} // only one attempt
 	}
 
 	// -----------------------------------------------------------------------------
 	String cfg(String nm) {
-		String s = (String) Defaults.cfg.get(nm);
+		String s = Defaults.cfg.get(nm);
 		if (s == null)
 			return "";
 		else
@@ -298,11 +298,11 @@ public abstract class PrimitiveEmulator extends JFrame implements Runnable {
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			Set<String> e = Keyboard.asInt.keySet();
 			for (String n : e) {
-				Integer vk = (Integer) Keyboard.asInt.get(n);
+				Integer vk = Keyboard.asInt.get(n);
 				String s = cfg(n);
 				if (!s.equals("")) {
 					s = new StringTokenizer(s).nextToken();
-					lv.setKb(vk.intValue(), Integer.parseInt(s, 16));
+					lv.setKb(vk, Integer.parseInt(s, 16));
 				}
 			}
 

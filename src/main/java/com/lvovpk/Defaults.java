@@ -54,7 +54,6 @@ class Defaults {
 		cfg.put("VK_S", "66FF");
 		cfg.put("VK_A", "67FF");
 
-		cfg.put("VK_?", "50FF");
 		cfg.put("VK_?", "51FF");
 		cfg.put("VK_Q", "52FF");
 		cfg.put("VK_Y", "53FF");

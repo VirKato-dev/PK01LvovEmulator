@@ -47,16 +47,16 @@ class PK01 extends PK00 {
 	}
 
 	// -----------------------------------------------------------------------------
-	long[] speaked() {
-		if (pk.speaked < 0)
+	long[] spoken() {
+		if (pk.spoken < 0)
 			return null;
-		long[] data = new long[pk.speaked + 1];
+		long[] data = new long[pk.spoken + 1];
 
-		if (pk.speaked > 0)
-			System.arraycopy(pk.speaker, 0, data, 0, pk.speaked);
+		if (pk.spoken > 0)
+			System.arraycopy(pk.speaker, 0, data, 0, pk.spoken);
 
-		data[pk.speaked] = pk.clock;
-		pk.speaked = 0;
+		data[pk.spoken] = pk.clock;
+		pk.spoken = 0;
 		return data;
 	}
 
@@ -95,7 +95,7 @@ class PK01 extends PK00 {
 		try {
 			for (;; pos++)
 				pk.doWrite(pos, Utils.restoreByte(prog));
-		} catch (EOFException ex) {
+		} catch (EOFException ignored) {
 		}
 		setVar(Bios.BASIC_PROG_END, pos);
 	}
@@ -208,7 +208,7 @@ class PK01 extends PK00 {
 
 	// -----------------------------------------------------------------------------
 	boolean restore(InputStream from) throws Exception {
-		int sign[] = new int[16];
+		int[] sign = new int[16];
 
 		Utils.restoreBytes(from, sign); // row 0 - signature
 		for (int i = 0; i < 14; i++)
@@ -221,12 +221,8 @@ class PK01 extends PK00 {
 		else if (sign[14] != 'P')
 			throw new Exception("Wrong .LVD sub-sign: " + Utils.HEX(sign[14]));
 
-		short line[] = new short[16];
+		short[] line = new short[16];
 		Utils.restoreBytes(from, line);
-		if (full) // row 1 - flags (full dump)
-		{
-		}
-
 		Utils.restoreBytes(from, line); // row 2 - registers
 		pk.rPC = line[0] * 256 + line[1];
 		pk.rSP = line[2] * 256 + line[3];
@@ -240,10 +236,8 @@ class PK01 extends PK00 {
 		pk.rL = line[11];
 
 		Utils.restoreBytes(from, line); // row 3 - ports
-		for (int i = 0; i < 4; i++)
-			pk.ports[0xC0 + i] = line[i];
-		for (int i = 0; i < 4; i++)
-			pk.ports[0xD0 + i] = line[i + 4];
+		System.arraycopy(line, 0, pk.ports, 192, 4);
+		System.arraycopy(line, 4, pk.ports, 208, 4);
 
 		Utils.restoreBytes(from, pk.video);
 		if (full)

@@ -30,19 +30,19 @@ public class Utils {
 
 		for (String key : e) { // sort in ascending order
 			for (i = 0; i < vct.size(); i++)
-				if (key.compareTo(vct.elementAt(i).toString()) < 0)
+				if (key.compareTo(vct.elementAt(i)) < 0)
 					break;
 			vct.insertElementAt(key, i);
 		}
 
-		String result[] = new String[vct.size()]; // then prepare data for client
+		String[] result = new String[vct.size()]; // then prepare data for client
 
 		if (ascend)
 			for (i = 0; i < vct.size(); i++) // ok, leave intact
-				result[i] = vct.elementAt(i).toString();
+				result[i] = vct.elementAt(i);
 		else
 			for (i = 0; i < vct.size(); i++) // hmm, needs to reverse order of data
-				result[vct.size() - i - 1] = vct.elementAt(i).toString();
+				result[vct.size() - i - 1] = vct.elementAt(i);
 
 		return result;
 	}
@@ -115,29 +115,29 @@ public class Utils {
 	}
 
 	// -----------------------------------------------------------------------------
-	public static void dumpBytes(OutputStream to, int dat[]) throws IOException {
+	public static void dumpBytes(OutputStream to, int[] dat) throws IOException {
 		dumpBytes(to, dat, 0, dat.length);
 	}
 
-	public static void dumpBytes(OutputStream to, int dat[], int off, int len) throws IOException {
+	public static void dumpBytes(OutputStream to, int[] dat, int off, int len) throws IOException {
 		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++);
 	}
 
 	// -----------------------------------------------------------------------------
-	public static void dumpBytes(OutputStream to, short dat[]) throws IOException {
+	public static void dumpBytes(OutputStream to, short[] dat) throws IOException {
 		dumpBytes(to, dat, 0, dat.length);
 	}
 
-	public static void dumpBytes(OutputStream to, short dat[], int off, int len) throws IOException {
+	public static void dumpBytes(OutputStream to, short[] dat, int off, int len) throws IOException {
 		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++);
 	}
 
 	// -----------------------------------------------------------------------------
-	public static void dumpBytes(OutputStream to, byte dat[]) throws IOException {
+	public static void dumpBytes(OutputStream to, byte[] dat) throws IOException {
 		dumpBytes(to, dat, 0, dat.length);
 	}
 
-	public static void dumpBytes(OutputStream to, byte dat[], int off, int len) throws IOException {
+	public static void dumpBytes(OutputStream to, byte[] dat, int off, int len) throws IOException {
 		for (int i = 0; i < len; dumpByte(to, dat[off + i]), i++);
 	}
 
@@ -164,29 +164,29 @@ public class Utils {
 	}
 
 	// -----------------------------------------------------------------------------
-	public static void restoreBytes(InputStream from, int dat[]) throws IOException {
+	public static void restoreBytes(InputStream from, int[] dat) throws IOException {
 		restoreBytes(from, dat, 0, dat.length);
 	}
 
-	public static void restoreBytes(InputStream from, int dat[], int off, int len) throws IOException {
+	public static void restoreBytes(InputStream from, int[] dat, int off, int len) throws IOException {
 		for (int i = 0; i < len; dat[off + i] = restoreByte(from), i++);
 	}
 
 	// -----------------------------------------------------------------------------
-	public static void restoreBytes(InputStream from, short dat[]) throws IOException {
+	public static void restoreBytes(InputStream from, short[] dat) throws IOException {
 		restoreBytes(from, dat, 0, dat.length);
 	}
 
-	public static void restoreBytes(InputStream from, short dat[], int off, int len) throws IOException {
+	public static void restoreBytes(InputStream from, short[] dat, int off, int len) throws IOException {
 		for (int i = 0; i < len; dat[off + i] = (short) restoreByte(from), i++);
 	}
 
 	// -----------------------------------------------------------------------------
-	public static void restoreBytes(InputStream from, byte dat[]) throws IOException {
+	public static void restoreBytes(InputStream from, byte[] dat) throws IOException {
 		restoreBytes(from, dat, 0, dat.length);
 	}
 
-	public static void restoreBytes(InputStream from, byte dat[], int off, int len) throws IOException {
+	public static void restoreBytes(InputStream from, byte[] dat, int off, int len) throws IOException {
 		for (int i = 0; i < len; dat[off + i] = (byte) restoreByte(from), i++);
 	}
 
@@ -207,15 +207,7 @@ public class Utils {
 
 	// -----------------------------------------------------------------------------
 	public static File openFileDialog(JFrame wnd, String currentDir, String title, String... masks) {
-		JFileChooser dlg = new JFileChooser(currentDir);
-		dlg.setDialogTitle(title);
-		dlg.setAcceptAllFileFilterUsed(false);
-		for (String mask : masks) {
-			String[] maskArr = mask.split("#");
-			FileNameExtensionFilter filter = new FileNameExtensionFilter(
-					(maskArr.length > 1 ? maskArr[0] : "*." + maskArr[0]), maskArr[maskArr.length - 1].split(";"));
-			dlg.addChoosableFileFilter(filter);
-		}
+		JFileChooser dlg = initFileChooser(currentDir, title, masks);
 
 		int returnValue = dlg.showOpenDialog(wnd);
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -225,15 +217,7 @@ public class Utils {
 	}
 
 	public static File saveFileDialog(JFrame wnd, String currentDir, String title, String... masks) {
-		JFileChooser dlg = new JFileChooser(currentDir);
-		dlg.setDialogTitle(title);
-		dlg.setAcceptAllFileFilterUsed(false);
-		for (String mask : masks) {
-			String[] maskArr = mask.split("#");
-			FileNameExtensionFilter filter = new FileNameExtensionFilter(
-					(maskArr.length > 1 ? maskArr[0] : "*." + maskArr[0]), maskArr[maskArr.length - 1].split(";"));
-			dlg.addChoosableFileFilter(filter);
-		}
+		JFileChooser dlg = initFileChooser(currentDir, title, masks);
 
 		int returnValue = dlg.showSaveDialog(wnd);
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -248,7 +232,20 @@ public class Utils {
 		}
 		return null;
 	}
-	
+
+	private static JFileChooser initFileChooser(String currentDir, String title, String[] masks) {
+		JFileChooser dlg = new JFileChooser(currentDir);
+		dlg.setDialogTitle(title);
+		dlg.setAcceptAllFileFilterUsed(false);
+		for (String mask : masks) {
+			String[] maskArr = mask.split("#");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+					(maskArr.length > 1 ? maskArr[0] : "*." + maskArr[0]), maskArr[maskArr.length - 1].split(";"));
+			dlg.addChoosableFileFilter(filter);
+		}
+		return dlg;
+	}
+
 	public static String getFileExtension(String fileName) {
 		int lastDotIndex = fileName.lastIndexOf(".");
 		if (lastDotIndex == -1 || lastDotIndex == (fileName.length() - 1)) {

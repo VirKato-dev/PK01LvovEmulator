@@ -22,7 +22,7 @@ class PKIO {
 	// -----------------------------------------------------------------------------
 	final static String NL = System.getProperty("line.separator", "\r\n");
 
-	private static String codes[][] = {
+	private static String[][] codes = {
 		
 		// Unicode //
 		{"\u045b\u0402\u0403\u2013\u201e\u2026\u201d\u0453"+ //  866 upcase
@@ -120,7 +120,7 @@ class PKIO {
 	// -----------------------------------------------------------------------------
 	// T a p e s H a n d l i n g
 	// -----------------------------------------------------------------------------
-	private static String toks[] = {
+	private static String[] toks = {
 		// 0x80
 		"END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ", "LET",
 		"GOTO", "RUN", "IF", "RESTORE", "GOSUB", "RETURN", "REM", "STOP",
@@ -149,7 +149,7 @@ class PKIO {
 
 	// -----------------------------------------------------------------------------
 	static int recognize(InputStream prog) throws IOException {
-		int sign[] = new int[16];
+		int[] sign = new int[16];
 		Utils.restoreBytes(prog, sign);
 
 		for (int i = 0; i < 9; i++) // it's prefix
@@ -161,7 +161,7 @@ class PKIO {
 
 	// -----------------------------------------------------------------------------
 	static void prepare(OutputStream prog, String name, int type, int cp) throws IOException {
-		int sign[] = new int[16]; // preparing signature
+		int[] sign = new int[16]; // preparing signature
 
 		for (int i = 0; i < 9; i++) // it's prefix
 			sign[i] = "LVOV/2.0/".charAt(i);

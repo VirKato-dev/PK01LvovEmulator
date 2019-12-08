@@ -17,7 +17,7 @@ public class EmulatorMain extends EmulatorUI {
 	 * 
 	 */
 	private static final long serialVersionUID = 4339279222189621874L;
-	private String args[];
+	private String[] args;
 
 	// -----------------------------------------------------------------------------
 	@Override
@@ -25,7 +25,7 @@ public class EmulatorMain extends EmulatorUI {
 		super.init();
 		if (initFailed == null && args != null && args.length >= 1 && !args[0].equals("-r"))
 			restore(args[0]);
-		else if (initFailed == null && args != null && args.length >= 3 && args[0].equals("-r"))
+		else if (initFailed == null && args != null && args.length >= 3) // args[0] equals "-r"
 			restore(args[2]);
 	}
 
@@ -51,11 +51,11 @@ public class EmulatorMain extends EmulatorUI {
 	// -----------------------------------------------------------------------------
 	// I n i t i a l i z a t i o n
 	// -----------------------------------------------------------------------------
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		if (System.getProperty("swing.defaultlaf") == null) {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception ex) {
+			} catch (Exception ignored) {
 			}
 		}
 		try {

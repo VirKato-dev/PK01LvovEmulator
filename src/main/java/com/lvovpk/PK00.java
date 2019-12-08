@@ -72,27 +72,27 @@ abstract class PK00 extends Canvas implements KeyListener {
 
 	// -----------------------------------------------------------------------------
 	public void clrKb(int vk) {
-		keyMask.remove(Integer.valueOf(vk));
+		keyMask.remove(vk);
 	}
 
 	public void setKb(int vk, int mask) {
-		keyMask.put(Integer.valueOf(vk), Integer.valueOf(mask));
+		keyMask.put(vk, mask);
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
 	public void keyPressed(KeyEvent e) {
-		Integer mask = (Integer) keyMask.get(Integer.valueOf(e.getKeyCode()));
+		Integer mask = keyMask.get(e.getKeyCode());
 		if (mask != null)
-			kbd(mask.intValue(), true);
+			kbd(mask, true);
 	}
 
 	// -----------------------------------------------------------------------------
 	@Override
 	public void keyReleased(KeyEvent e) {
-		Integer mask = (Integer) keyMask.get(Integer.valueOf(e.getKeyCode()));
+		Integer mask = keyMask.get(e.getKeyCode());
 		if (mask != null)
-			kbd(mask.intValue(), false);
+			kbd(mask, false);
 	}
 
 	// -----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 		int bcol = (mask >> 12) & 0x0F;
 		int brow = (mask >> 8) & 0x0F;
 		int ecol = (mask >> 4) & 0x0F;
-		int erow = (mask >> 0) & 0x0F;
+		int erow = (mask) & 0x0F;
 
 		if (brow < 8 && bcol < 8)
 			if (press)
@@ -127,13 +127,15 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// a n d S u p p l e m e n t a r y S t u f f
 	// -----------------------------------------------------------------------------
 	// BLACK=0, BLUE=1, GREEN=2, CYAN=3, RED=4, MAGENTA=5, YELLOW=6, WHITE=7
-	private static byte
-		b[] = { (byte)0x00, (byte)0xC0, (byte)0x00, (byte)0xC0,
-				(byte)0x00, (byte)0xC0, (byte)0x00, (byte)0xFF },
-		g[] = { (byte)0x00, (byte)0x00, (byte)0xC0, (byte)0xC0,
-				(byte)0x00, (byte)0x00, (byte)0xC0, (byte)0xFF },
-		r[] = { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
-				(byte)0xC0, (byte)0xC0, (byte)0xC0, (byte)0xFF };
+	private static byte[] b = {
+			(byte)0x00, (byte)0xC0, (byte)0x00, (byte)0xC0,
+			(byte)0x00, (byte)0xC0, (byte)0x00, (byte)0xFF };
+	private static byte[] g = {
+			(byte)0x00, (byte)0x00, (byte)0xC0, (byte)0xC0,
+			(byte)0x00, (byte)0x00, (byte)0xC0, (byte)0xFF };
+	private static byte[] r = {
+			(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+			(byte)0xC0, (byte)0xC0, (byte)0xC0, (byte)0xFF };
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private boolean renderInterlaced;

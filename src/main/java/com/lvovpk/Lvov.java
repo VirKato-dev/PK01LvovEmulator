@@ -1,5 +1,7 @@
 package com.lvovpk;
 
+import java.util.Arrays;
+
 /**
  * LVOV Hardware Abstraction
  */
@@ -7,7 +9,7 @@ class Lvov extends I8080 {
 	byte[] printer;
 	int printed;
 	long[] speaker;
-	int speaked;
+	int spoken;
 
 	boolean[] dirty;
 
@@ -64,8 +66,8 @@ class Lvov extends I8080 {
 			break;
 
 		case 0xC2:
-			if (speaker != null && speaked < speaker.length && ((bt ^ ports[0xC2]) & 1) != 0)
-				speaker[speaked++] = clock;
+			if (speaker != null && spoken < speaker.length && ((bt ^ ports[0xC2]) & 1) != 0)
+				speaker[spoken++] = clock;
 			break;
 		}
 		ports[port] = (short) bt;
@@ -148,8 +150,7 @@ class Lvov extends I8080 {
 
 	// -----------------------------------------------------------------------------
 	void reset() {
-		for (int i = 0; i < ports.length; i++)
-			ports[i] = 0xFF;
+		Arrays.fill(ports, (short) 0xFF);
 		dirty = null;
 	}
 
@@ -168,7 +169,7 @@ class Lvov extends I8080 {
 			speaker = null;
 		else if (speaker == null || size < speaker.length)
 			speaker = new long[size];
-		speaked = 0;
+		spoken = 0;
 	}
 
 	// -----------------------------------------------------------------------------

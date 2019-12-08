@@ -95,7 +95,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			o.println("");
 
 			o.close();
-		} catch (IOException ex) {
+		} catch (IOException ignored) {
 		}
 	}
 
@@ -664,6 +664,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			else
 				lv.removeKeyListener(this);
 		}
+		lv.requestFocus();
 	}
 
 	private void showChangeTicksDialog() {
@@ -687,7 +688,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	private void showAboutDialog() {
 		JOptionPane.showMessageDialog(this,
-				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.2\n"
+				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.3\n"
 						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n"
 						+ "(c) 2019 by Izhak Serovsky \n"
 						+ "Run with the -h switch to view the available command-line options\n\n"
@@ -715,7 +716,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 		try {
 			setIconImage(createImage((ImageProducer) getClass().getResource("/pk01lvov.gif").getContent()));
-		} catch (IOException e) {
+		} catch (IOException ignored) {
 		}
 
 		if (configFileName != null) {

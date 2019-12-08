@@ -263,7 +263,7 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 			ByteArrayInputStream is = new ByteArrayInputStream(tmp.toByteArray());
 			tmp.close();
 
-			String result = PKIO.basic2text(is, PKIO.CP_DEFAULT).toString();
+			String result = PKIO.basic2text(is, PKIO.CP_DEFAULT);
 
 			is.close();
 			return result;
@@ -435,7 +435,7 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 				while (ireq == CM_PAUSE)
 					try {
 						Thread.sleep(1000);
-					} catch (InterruptedException ex) {
+					} catch (InterruptedException ignored) {
 					}
 				break;
 			}

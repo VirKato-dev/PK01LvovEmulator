@@ -119,7 +119,7 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 	// -----------------------------------------------------------------------------
 	// D e b u g g e r I m p l e m e n t a t i o n
 	// -----------------------------------------------------------------------------
-	static String hex0[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
+	static String[] hex0 = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
 
 	static String hex1(int val) {
 		return hex0[val & 15];
@@ -153,13 +153,13 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 			sz_Code = 16, new_Code = ptr_Code;
 
 	// -----------------------------------------------------------------------------
-	static String flags[][] = new String[][] {
+	static String[][] flags = new String[][] {
 			{ "P", "M" }, { "NZ", "Z" },  { "0", "1" }, { "ac", "AC" },
 			{ "0", "1" }, { "PO", "PE" }, { "0", "1" }, { "NC", "C" }
 		};
 
 	// -----------------------------------------------------------------------------
-	static String opcodes[] = new String[] {
+	static String[] opcodes = new String[] {
 			"NOP", "LXI\tB,#", "STAX\tB", "INX\tB", "INR\tB", "DCR\tB", "MVI\tB,*",	"RLC",
 			"!NOP", "DAD\tB",  "LDAX\tB", "DCX\tB", "INR\tC", "DCR\tC", "MVI\tC,*", "RRC",
 
