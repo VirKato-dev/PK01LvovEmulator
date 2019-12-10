@@ -44,6 +44,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	 * 
 	 */
 	private static final long serialVersionUID = 46689693694740808L;
+	static final String EMULATOR_VERSION = "1.3";
 	static final int CM_CONFIG = 19;
 	static final int CM_INVOKE_EDITOR = 20;
 	static final int CM_SYNC_EDITOR_IN = 21;
@@ -175,7 +176,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			{ "Snap", "No", "Yes", "Yes", "Yes" },
 			{ "PRN_O", "No", "Yes", "Yes", "Yes" },
 			{ "PRN_C", "No", "Yes", "Yes", "Yes" },
-			{ "About", "No", "No", "Yes", "No" },
+			{ "About", "Yes", "No", "Yes", "Yes" },
 			{ "Log", "Yes", "No", "Yes", "Yes" },
 			{ "Cfg", "No", "Yes", "Yes", "Yes" },
 			{ "Quit", "No", "No", "Yes", "Yes" }
@@ -237,6 +238,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	// -----------------------------------------------------------------------------
 	private void mkToolbar(String name, JToolBar tb) {
 		mkToolbarButton(tb, name, "Mode", CM_MODE, "Mode");
+		mkToolbarButton(tb, name, "Fullscreen", CM_TOGGLE_FULLSCREEN, "Fullscreen");
 		mkToolbarButton(tb, name, "Ticks", CM_CHANGE_TICKS, "Ticks");
 		mkToolbarButton(tb, name, "Fast", CM_FAST, "Fast");
 		mkToolbarButton(tb, name, "Slow", CM_SLOW, "Slow");
@@ -261,8 +263,8 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		mkToolbarButton(tb, name, "DumpP", CM_DUMP_P, "Partial");
 		mkToolbarButton(tb, name, "Snap", CM_SNAP, "Snap");
 
-		mkToolbarButton(tb, name, "About", CM_INVOKE_ABOUT, "About");
 		mkToolbarButton(tb, name, "Log", CM_INVOKE_LOG, "Log");
+		mkToolbarButton(tb, name, "About", CM_INVOKE_ABOUT, "About");
 		mkToolbarButton(tb, name, "Cfg", CM_CONFIG, "Conf");
 		mkToolbarButton(tb, name, "Quit", CM_STOP, "Quit");
 	}
@@ -664,7 +666,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			else
 				lv.removeKeyListener(this);
 		}
-		lv.requestFocus();
+		lv.requestFocusInWindow();
 	}
 
 	private void showChangeTicksDialog() {
@@ -688,11 +690,18 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 	private void showAboutDialog() {
 		JOptionPane.showMessageDialog(this,
-				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) 1.3\n"
-						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov) \n"
-						+ "(c) 2019 by Izhak Serovsky \n"
-						+ "Run with the -h switch to view the available command-line options\n\n"
+				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) " + EMULATOR_VERSION + "\n"
+						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov)\n"
+						+ "(c) 2019 by Izhak Serovsky\n"
 						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
+						+ "Run with the following command-line options:\n"
+						+ "    -d <conf_file> to dump the default configurations\n"
+						+ "    -r <conf_file> to replace the default configurations\n"
+						+ "    -p <basic_file> to produce basic .lvt from textual stdin\n"
+						+ "            (-p866 -p1251 -pkoi8 allows you to specify the codepage)\n"
+						+ "    -v <basic_file> to list/view basic .lvt onto textual stdout\n"
+						+ "            (-v866 -v1251 -vkoi8 allows you to specify the codepage)\n"
+						+ "    -h to print the available command-line options\n\n"
 						+ "The emulator is distributed under the GNU General Public License version 2");
 	}
 

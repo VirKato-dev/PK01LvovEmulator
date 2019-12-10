@@ -407,6 +407,8 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 			else if (op.startsWith("F"))
 				peer.F(hex(op.substring(1)));
 			break;
+		default:
+			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		}
 		return false;

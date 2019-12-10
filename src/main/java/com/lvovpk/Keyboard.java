@@ -28,6 +28,7 @@ class Keyboard {
 			{ KeyEvent.VK_U,      1, EmulatorUI.CM_RESTORE },
 			{ KeyEvent.VK_E,      1, EmulatorUI.CM_EXPORT },
 			{ KeyEvent.VK_D,      1, EmulatorUI.CM_DUMP_F },
+			{ KeyEvent.VK_A,      1, EmulatorUI.CM_INVOKE_ABOUT },
 			{ KeyEvent.VK_O,      1, EmulatorUI.CM_INVOKE_LOG },
 			{ KeyEvent.VK_S,      1, EmulatorUI.CM_SNAP },
 			{ KeyEvent.VK_T,      1, EmulatorUI.CM_CHANGE_TICKS },

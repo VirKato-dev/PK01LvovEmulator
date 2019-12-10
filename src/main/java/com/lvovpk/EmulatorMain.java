@@ -102,14 +102,16 @@ public class EmulatorMain extends EmulatorUI {
 
 			// -----------------------------------------------------------------------------
 			else {
-				System.out.println("USAGE: PK01LvovEmulator.jar -d <conf_file> to dump default configurations" + PKIO.NL
-						+ "                  -r <conf_file> to replace default configurations" + PKIO.NL
-						+ "                  -p <basic_file> to produce basic .lvt from textual stdin" + PKIO.NL
-						+ "                     -p866 -p1251 -pkoi8 allows you to specify codepage," + PKIO.NL
-						+ "                     -p just uses default and it isn't good on wintel" + PKIO.NL
-						+ "                  -v <basic_file> to list/view basic .lvt onto textual stdout" + PKIO.NL
-						+ "                     -v866 -v1251 -vkoi8 allows you to specify codepage" + PKIO.NL
-						+ "                  -h show this information" + PKIO.NL);
+				System.out.println(
+						"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) " + EMULATOR_VERSION + PKIO.NL
+								+ "Use the following command-line options: " + PKIO.NL
+								+ "    -d <conf_file> to dump the default configurations" + PKIO.NL
+								+ "    -r <conf_file> to replace the default configurations" + PKIO.NL
+								+ "    -p <basic_file> to produce basic .lvt from textual stdin" + PKIO.NL
+								+ "        (-p866 -p1251 -pkoi8 allows you to specify the codepage)" + PKIO.NL
+								+ "    -v <basic_file> to list/view basic .lvt onto textual stdout" + PKIO.NL
+								+ "        (-v866 -v1251 -vkoi8 allows you to specify the codepage)" + PKIO.NL
+								+ "    -h to show this information" + PKIO.NL);
 				if (!args[0].equals("-h")) {
 					throw new Exception("Unrecognized command line option");
 				}
