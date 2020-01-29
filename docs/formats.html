@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>File Formats</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        table, td, th {
+            border: 1px solid black;
+        }
+</style>
+</head>
+
+<body>
+<h1>File Formats</h1>
+
+<table>
+
+<tr><td>Offset</td><td>Size</td><td>Value</td><td>Description</td></tr>
+
+<tr><td colspan="4">BASIC .LVT/.LVR</td></tr>
+<tr><td>+0x00</td><td>9</td><td>"LVOV/2.0/"</td>
+    <td>Primary .LVT tape signature</td></tr>
+<tr><td>+0x09</td><td>1</td><td>0xD3</td>
+    <td>Secondary .LVT signature (BASIC)</td></tr>
+<tr><td>+0x0A</td><td>6</td><td>"......"</td>
+    <td>Name of the tape in KOI7 (aligned with spaces)</td></tr>
+<tr><td>+0x10</td><td>upto EOF</td><td>0x??, ...</td>
+    <td>The text of the BASIC program in the internal format:
+    <br>DW: 0 ?, DW, DB (...), DB: 0 - sign of the end of the program, line number,
+        tokenized line, end of line
+    </td></tr>
+
+<tr><td colspan="4">CODE .LVT</td></tr>
+<tr><td>+0x00</td><td>9</td><td>"LVOV/2.0/"</td>
+    <td>Primary .LVT tape signature</td></tr>
+<tr><td>+0x09</td><td>1</td><td>0xD0</td>
+    <td>Secondary .LVT signature (Binary)</td></tr>
+<tr><td>+0x0A</td><td>6</td><td>"......"</td>
+    <td>Name of the tape in KOI7 (aligned with spaces)</td></tr>
+<tr><td>+0x10</td><td>2</td><td>0x????</td>
+    <td>Program start address</td></tr>
+<tr><td>+0x12</td><td>2</td><td>0x????</td>
+    <td>Program end address</td></tr>
+<tr><td>+0x14</td><td>2</td><td>0x????</td>
+    <td>Program entry point address</td></tr>
+<tr><td>+0x16</td><td>upto EOF</td><td>0x??, ...</td>
+    <td>Program body</td></tr>
+
+<tr><td colspan="4">DUMP .LVD</td></tr>
+<tr><td colspan="4">If possible, distribute software in .LVT format,
+    .LVD format is considered to be a "service format" and should only be used in situations
+    when it is really necessary
+    </td></tr>
+<tr><td>+0x00</td><td>14</td><td>"LVOV/DUMP/3.0/"</td>
+    <td>Primary .LVD Dump signature</td></tr>
+<tr><td>+0x0E</td><td>1</td><td>'F' or 'P'</td>
+    <td>Secondary signature of .LVD dump
+    <br>'P' - partial dump (without ROM),
+    <br>'F' - full dump (with ROM)</td></tr>
+<tr><td>+0x0F</td><td>1</td><td>0x00</td>
+    <td>.LVD signature delimiter</td></tr>
+
+<tr><td>+0x10</td><td>16</td><td>0x00, ...</td>
+    <td>Flags field, currently not used</td></tr>
+
+<tr><td>+0x20</td> <td>2</td> <td>0x????</td> <td>PC</td></tr>
+<tr><td>+0x22</td> <td>2</td> <td>0x????</td> <td>SP</td></tr>
+<tr><td>+0x24</td> <td>1</td> <td>0x??</td> <td>A</td></tr>
+<tr><td>+0x25</td> <td>1</td> <td>0x??</td> <td>F</td></tr>
+<tr><td>+0x26</td> <td>1</td> <td>0x??</td> <td>B</td></tr>
+<tr><td>+0x27</td> <td>1</td> <td>0x??</td> <td>C</td></tr>
+<tr><td>+0x28</td> <td>1</td> <td>0x??</td> <td>D</td></tr>
+<tr><td>+0x29</td> <td>1</td> <td>0x??</td> <td>E</td></tr>
+<tr><td>+0x2A</td> <td>1</td> <td>0x??</td> <td>H</td></tr>
+<tr><td>+0x2B</td> <td>1</td> <td>0x??</td> <td>L</td></tr>
+<tr><td>+0x2C</td> <td>4</td> <td>0x??, ...</td> <td>Alignment</td></tr>
+
+<tr><td>+0x30</td> <td>1</td> <td>0x??</td> <td>port[0xC0]</td></tr>
+<tr><td>+0x31</td> <td>1</td> <td>0x??</td> <td>port[0xC1]</td></tr>
+<tr><td>+0x32</td> <td>1</td> <td>0x??</td> <td>port[0xC2]</td></tr>
+<tr><td>+0x33</td> <td>1</td> <td>0x??</td> <td>port[0xC3]</td></tr>
+
+<tr><td>+0x34</td> <td>1</td> <td>0x??</td> <td>port[0xD0]</td></tr>
+<tr><td>+0x35</td> <td>1</td> <td>0x??</td> <td>port[0xD1]</td></tr>
+<tr><td>+0x36</td> <td>1</td> <td>0x??</td> <td>port[0xD2]</td></tr>
+<tr><td>+0x37</td> <td>1</td> <td>0x??</td> <td>port[0xD3]</td></tr>
+<tr><td>+0x38</td> <td>8</td> <td>0x??, ...</td> <td>Alignment</td></tr>
+
+<tr><td>+0x40</td> <td>0x4000</td> <td>0x??, ...</td>
+    <td>VRAM</td></tr>
+
+<tr><td>+0x4040</td> <td>0xC000</td> <td>0x??, ...</td>
+    <td>RAM</td></tr>
+
+<tr><td>+0x10040</td> <td>0x4000</td> <td>0x??, ...</td>
+    <td>ROM (only for "full" state dump,
+    secondary signature == 'F')</td></tr>
+
+<tr><td colspan="4">BASIC .BAS</td></tr>
+<tr><td colspan="4">BASIC program in plain text,
+    encodings used: KOI8, 1251, 866</td></tr>
+
+<tr><td colspan="4">DUMP .SAV</td></tr>
+<tr><td colspan="4">The dump format of the old version of the emulator.
+    <br>Not supported, once it was mostly used for debugging.
+    It is not recommended to use it for software distribution
+    </td></tr>
+
+</table>
+
+<br>
+<br>
+
+<h1>Форматы файлов</h1>
+
+<table>
+
+<tr><td>Смещение</td><td>Размер</td><td>Значение</td><td>Описание</td></tr>
+
+<tr><td colspan="4">BASIC .LVT/.LVR</td></tr>
+<tr><td>+0x00</td><td>9</td><td>"LVOV/2.0/"</td>
+    <td>Первичная сигнатура .LVT-ленты</td></tr>
+<tr><td>+0x09</td><td>1</td><td>0xD3</td>
+    <td>Вторичная .LVT сигнатура (BASIC)</td></tr>
+<tr><td>+0x0A</td><td>6</td><td>"......"</td>
+    <td>Имя ленты в КОИ7 (выравнено пробелами)</td></tr>
+<tr><td>+0x10</td><td>upto EOF</td><td>0x??, ...</td>
+    <td>Текст бейсик-программы во внутреннем формате:
+    <br>DW:0?, DW, DB(...), DB:0 - признак конца программы, номер строки,
+        токенизированная строка, конец строки
+    </td></tr>
+
+<tr><td colspan="4">CODE .LVT</td></tr>
+<tr><td>+0x00</td><td>9</td><td>"LVOV/2.0/"</td>
+    <td>Первичная сигнатура .LVT-ленты</td></tr>
+<tr><td>+0x09</td><td>1</td><td>0xD0</td>
+    <td>Вторичная .LVT сигнатура (Binary)</td></tr>
+<tr><td>+0x0A</td><td>6</td><td>"......"</td>
+    <td>Имя ленты в КОИ7 (выравнено пробелами)</td></tr>
+<tr><td>+0x10</td><td>2</td><td>0x????</td>
+    <td>Адрес начала размещения программы</td></tr>
+<tr><td>+0x12</td><td>2</td><td>0x????</td>
+    <td>Адрес конца размещения программы</td></tr>
+<tr><td>+0x14</td><td>2</td><td>0x????</td>
+    <td>Адрес точки запуска программы</td></tr>
+<tr><td>+0x16</td><td>upto EOF</td><td>0x??, ...</td>
+    <td>Тело программы</td></tr>
+
+<tr><td colspan="4">DUMP .LVD</td></tr>
+<tr><td colspan="4">Следует по возможности распространять ПО в формате .LVT,
+    формат .LVD следует считать служебным и применять только в тех ситуациях,
+    когда это действительно необходимо
+    </td></tr>
+<tr><td>+0x00</td><td>14</td><td>"LVOV/DUMP/3.0/"</td>
+    <td>Первичная сигнатура .LVD-дампа</td></tr>
+<tr><td>+0x0E</td><td>1</td><td>'F' or 'P'</td>
+    <td>Вторичная сигнатура .LVD-дампа
+    <br>'P' - частичный дамп (без ПЗУ),
+    <br>'F' - полный дамп (с ПЗУ)</td></tr>
+<tr><td>+0x0F</td><td>1</td><td>0x00</td>
+    <td>Ограничитель .LVD сигнатуры</td></tr>
+
+<tr><td>+0x10</td><td>16</td><td>0x00, ...</td>
+    <td>Поле флагов, в настоящий момент времени не используется</td></tr>
+
+<tr><td>+0x20</td> <td>2</td> <td>0x????</td> <td>PC</td></tr>
+<tr><td>+0x22</td> <td>2</td> <td>0x????</td> <td>SP</td></tr>
+<tr><td>+0x24</td> <td>1</td> <td>0x??</td> <td>A</td></tr>
+<tr><td>+0x25</td> <td>1</td> <td>0x??</td> <td>F</td></tr>
+<tr><td>+0x26</td> <td>1</td> <td>0x??</td> <td>B</td></tr>
+<tr><td>+0x27</td> <td>1</td> <td>0x??</td> <td>C</td></tr>
+<tr><td>+0x28</td> <td>1</td> <td>0x??</td> <td>D</td></tr>
+<tr><td>+0x29</td> <td>1</td> <td>0x??</td> <td>E</td></tr>
+<tr><td>+0x2A</td> <td>1</td> <td>0x??</td> <td>H</td></tr>
+<tr><td>+0x2B</td> <td>1</td> <td>0x??</td> <td>L</td></tr>
+<tr><td>+0x2C</td> <td>4</td> <td>0x??, ...</td> <td>Выравнивание</td></tr>
+
+<tr><td>+0x30</td> <td>1</td> <td>0x??</td> <td>port[0xC0]</td></tr>
+<tr><td>+0x31</td> <td>1</td> <td>0x??</td> <td>port[0xC1]</td></tr>
+<tr><td>+0x32</td> <td>1</td> <td>0x??</td> <td>port[0xC2]</td></tr>
+<tr><td>+0x33</td> <td>1</td> <td>0x??</td> <td>port[0xC3]</td></tr>
+
+<tr><td>+0x34</td> <td>1</td> <td>0x??</td> <td>port[0xD0]</td></tr>
+<tr><td>+0x35</td> <td>1</td> <td>0x??</td> <td>port[0xD1]</td></tr>
+<tr><td>+0x36</td> <td>1</td> <td>0x??</td> <td>port[0xD2]</td></tr>
+<tr><td>+0x37</td> <td>1</td> <td>0x??</td> <td>port[0xD3]</td></tr>
+<tr><td>+0x38</td> <td>8</td> <td>0x??, ...</td> <td>Выравнивание</td></tr>
+
+<tr><td>+0x40</td> <td>0x4000</td> <td>0x??, ...</td>
+    <td>VRAM</td></tr>
+
+<tr><td>+0x4040</td> <td>0xC000</td> <td>0x??, ...</td>
+    <td>RAM</td></tr>
+
+<tr><td>+0x10040</td> <td>0x4000</td> <td>0x??, ...</td>
+    <td>ROM (только для "полного" дампа состояния,
+    вторичная сигнатура == 'F')</td></tr>
+
+<tr><td colspan="4">BASIC .BAS</td></tr>
+<tr><td colspan="4">Бейсик-программа в текстовом виде,
+    используемые кодировки: КОИ8, 1251, 866</td></tr>
+
+<tr><td colspan="4">DUMP .SAV</td></tr>
+<tr><td colspan="4">Формат дампов старой версии эмулятора.
+    <br>Не поддерживается, во многом в свое время он предназначался
+    для отладки, не рекомендую его использовать для распространения ПО
+    </td></tr>
+
+</table>
+</body>
+</html>
