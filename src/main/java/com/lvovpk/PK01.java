@@ -186,7 +186,24 @@ class PK01 extends PK00 {
 	}
 
 	// -----------------------------------------------------------------------------
-	void dump(OutputStream to, boolean full) throws Exception {
+	void dumpToSAV(OutputStream to) throws Exception {
+		String sign = "LVOV/DUMP/2.0/H+\u0000";
+		Utils.dumpBytes(to, sign);
+		Utils.dumpBytes(to, pk.memory);
+		Utils.dumpBytes(to, pk.video);
+		byte[] ports = new byte[0x100];
+		for (int i = 0; i < ports.length; i++) // ports
+			ports[i] = (byte) pk.ports[i];
+		Utils.dumpBytes(to, ports);
+		Utils.dumpBytes(to,
+				new byte[] { // registers
+						(byte) pk.rB, (byte) pk.rC, (byte) pk.rD, (byte) pk.rE,
+						(byte) pk.rH, (byte) pk.rL, (byte) pk.rA, (byte) pk.rF,
+						(byte) (pk.rSP & 0xFF), (byte) ((pk.rSP >> 8) & 0xFF),
+						(byte) (pk.rPC & 0xFF), (byte) ((pk.rPC >> 8) & 0xFF)});
+	}
+
+	void dumpToLVD(OutputStream to, boolean full) throws Exception {
 		String sign = full ? "LVOV/DUMP/3.0/F\u0000" : "LVOV/DUMP/3.0/P\u0000";
 		Utils.dumpBytes(to, sign);
 
@@ -211,16 +228,61 @@ class PK01 extends PK00 {
 		int[] sign = new int[16];
 
 		Utils.restoreBytes(from, sign); // row 0 - signature
-		for (int i = 0; i < 14; i++)
-			if ("LVOV/DUMP/3.0/".charAt(i) != sign[i])
-				throw new Exception("Wrong .LVD sign at " + i + " !");
+		int compareResult = compareHeader("LVOV/DUMP/2.0/H+", sign);
+		if (compareResult < 0) {
+			return restoreFromSAV(from);
+		}
+		else {
+			compareResult = compareHeader("LVOV/DUMP/3.0/", sign);
+			if (compareResult < 0) {
+				boolean full = false;
+				if (sign[14] == 'F')
+					full = true;
+				else if (sign[14] != 'P')
+					throw new Exception("Wrong .LVD sub-sign: " + Utils.HEX(sign[14]));
 
-		boolean full = false;
-		if (sign[14] == 'F')
-			full = true;
-		else if (sign[14] != 'P')
-			throw new Exception("Wrong .LVD sub-sign: " + Utils.HEX(sign[14]));
+				return restoreFromLVD(from, full);
+			}
+		}
+		throw new Exception("Wrong Dump sign at " + compareResult + " !");
+	}
 
+	private int compareHeader(String header, int[] sign) {
+		for (int i = 0; i < header.length(); i++)
+			if (header.charAt(i) != sign[i]) return i;
+		return -1;
+	}
+
+	private boolean restoreFromSAV(InputStream from) throws IOException {
+		Utils.restoreByte(from);
+		Utils.restoreBytes(from, pk.memory);
+		Utils.restoreBytes(from, pk.video);
+
+		byte[] ports = new byte[0x100];
+		Utils.restoreBytes(from, ports); // ports
+		for (int i = 0; i < ports.length; i++)
+			pk.ports[i] = (short) (ports[i] & 0xFF);
+
+		if (pk.ports[0xC1] == 0xFF) pk.ports[0xC1] = 0x8F;
+
+		byte[] registers = new byte[12];
+		Utils.restoreBytes(from, registers); // registers
+		pk.rB = registers[0] & 0xFF;
+		pk.rC = registers[1] & 0xFF;
+		pk.rD = registers[2] & 0xFF;
+		pk.rE = registers[3] & 0xFF;
+		pk.rH = registers[4] & 0xFF;
+		pk.rL = registers[5] & 0xFF;
+		pk.rA = registers[6] & 0xFF;
+		pk.rF = registers[7] & 0xFF;
+		pk.rSP = (registers[9] & 0xFF) * 256 + (registers[8] & 0xFF);
+		pk.rPC = (registers[11] & 0xFF) * 256 + (registers[10] & 0xFF);
+
+		pk.dirty = null;
+		return false;
+	}
+
+	private boolean restoreFromLVD(InputStream from, boolean full) throws IOException {
 		short[] line = new short[16];
 		Utils.restoreBytes(from, line);
 		Utils.restoreBytes(from, line); // row 2 - registers

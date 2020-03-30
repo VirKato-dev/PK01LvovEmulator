@@ -44,7 +44,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	 * 
 	 */
 	private static final long serialVersionUID = 46689693694740808L;
-	static final String EMULATOR_VERSION = "1.3";
+	static final String EMULATOR_VERSION = "1.4";
 	static final int CM_CONFIG = 19;
 	static final int CM_INVOKE_EDITOR = 20;
 	static final int CM_SYNC_EDITOR_IN = 21;
@@ -561,7 +561,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case CM_DUMP_F:
-			fn = showFileDialog(true, "Choose destination .LVD file", "lvd");
+			fn = showFileDialog(true, "Choose destination .SAV or .LVD file", "sav", "lvd");
 			if (fn != null)
 				doFullDump(fn);
 			break;
@@ -582,7 +582,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case CM_RESTORE:
-			fn = showFileDialog(false, "Choose source .LVD file", "lvd");
+			fn = showFileDialog(false, "Choose source .SAV or .LVD file", "sav", "lvd");
 			if (fn != null)
 				doRestore(fn);
 			break;
@@ -692,7 +692,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		JOptionPane.showMessageDialog(this,
 				"PK-01 Lvov (PK-01 Lviv) Computer Emulator (Java Version) " + EMULATOR_VERSION + "\n"
 						+ "(c) 2003 by Hard Wisdom (Vladimir Kalashnikov)\n"
-						+ "(c) 2019 by Izhak Serovsky\n"
+						+ "(c) 2020 by Izhak Serovsky\n"
 						+ "https://github.com/izhaks/PK01LvovEmulator\n\n"
 						+ "Run with the following command-line options:\n"
 						+ "    -d <conf_file> to dump the default configurations\n"

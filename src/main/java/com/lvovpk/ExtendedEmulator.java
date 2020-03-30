@@ -139,7 +139,10 @@ public abstract class ExtendedEmulator extends PrimitiveEmulator {
 		writeLog("Dumping " + (full ? "full" : "partial") + " state...");
 		try {
 			OutputStream dump = Utils.ZIP(name, new FileOutputStream(name));
-			lv.dump(dump, full);
+			if (full && Utils.getFileExtension(name).equalsIgnoreCase("sav"))
+				lv.dumpToSAV(dump);
+			else
+				lv.dumpToLVD(dump, full);
 			dump.close();
 			return true;
 		} catch (Exception ex) {
