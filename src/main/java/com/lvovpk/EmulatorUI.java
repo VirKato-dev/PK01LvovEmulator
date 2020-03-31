@@ -561,7 +561,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case CM_DUMP_F:
-			fn = showFileDialog(true, "Choose destination .SAV or .LVD file", "sav", "lvd");
+			fn = showFileDialog(true, "Choose destination .LVD or .SAV file", "lvd", "sav");
 			if (fn != null)
 				doFullDump(fn);
 			break;
@@ -582,7 +582,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 			break;
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		case CM_RESTORE:
-			fn = showFileDialog(false, "Choose source .SAV or .LVD file", "sav", "lvd");
+			fn = showFileDialog(false, "Choose source .LVD or .SAV file", "Dump files (*.lvd; *.sav)#lvd;sav");
 			if (fn != null)
 				doRestore(fn);
 			break;

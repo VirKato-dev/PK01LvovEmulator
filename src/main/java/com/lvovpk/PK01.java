@@ -263,7 +263,7 @@ class PK01 extends PK00 {
 		for (int i = 0; i < ports.length; i++)
 			pk.ports[i] = (short) (ports[i] & 0xFF);
 
-		if (pk.ports[0xC1] == 0xFF) pk.ports[0xC1] = 0x8F;
+		pk.ports[0xC1] = 0x8F; // restore the default palette
 
 		byte[] registers = new byte[12];
 		Utils.restoreBytes(from, registers); // registers
