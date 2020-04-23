@@ -191,16 +191,13 @@ class PK01 extends PK00 {
 		Utils.dumpBytes(to, sign);
 		Utils.dumpBytes(to, pk.memory);
 		Utils.dumpBytes(to, pk.video);
-		byte[] ports = new byte[0x100];
-		for (int i = 0; i < ports.length; i++) // ports
-			ports[i] = (byte) pk.ports[i];
-		Utils.dumpBytes(to, ports);
+		Utils.dumpBytes(to, pk.ports);
 		Utils.dumpBytes(to,
-				new byte[] { // registers
-						(byte) pk.rB, (byte) pk.rC, (byte) pk.rD, (byte) pk.rE,
-						(byte) pk.rH, (byte) pk.rL, (byte) pk.rA, (byte) pk.rF,
-						(byte) (pk.rSP & 0xFF), (byte) ((pk.rSP >> 8) & 0xFF),
-						(byte) (pk.rPC & 0xFF), (byte) ((pk.rPC >> 8) & 0xFF)});
+				new int[] { // registers
+						pk.rB, pk.rC, pk.rD, pk.rE, pk.rH, pk.rL, pk.rA, pk.rF,
+						(pk.rSP & 0xFF), ((pk.rSP >> 8) & 0xFF), (pk.rPC & 0xFF), ((pk.rPC >> 8) & 0xFF) });
+		Utils.dumpBytes(to,
+				new int[] { 0xC1, 0xAF, 0xFD, 0x02, 0x43, 0x02, 0x45, 0x02, 0x94, 0xDD, 0xA9, 0xBE, 0xAB, 0xBE });
 	}
 
 	void dumpToLVD(OutputStream to, boolean full) throws Exception {
