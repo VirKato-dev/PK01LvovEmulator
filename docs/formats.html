@@ -19,7 +19,7 @@
 
 <table>
 
-<tr><td>Offset</td><td>Size</td><td>Value</td><td>Description</td></tr>
+<tr><th>Offset</th><th>Size</th><th>Value</th><th>Description</th></tr>
 
 <tr><td colspan="4">BASIC .LVT/.LVR</td></tr>
 <tr><td>+0x00</td><td>9</td><td>"LVOV/2.0/"</td>
@@ -106,12 +106,37 @@
 
 <tr><td colspan="4">DUMP .SAV</td></tr>
 <tr><td colspan="4">The dump format of the old version of the emulator.
-    <br>Not supported, at one time it was supposed to be used mainly for debugging.
+    <br>At one time it was supposed to be used mainly for debugging.
     It is not recommended to use it for software distribution
     </td></tr>
+<tr><td>+0x00</td><td>16</td><td>"LVOV/DUMP/2.0/H+"</td>
+    <td>.SAV Dump signature</td></tr>
+<tr><td>+0x10</td><td>1</td><td>0x00</td>
+    <td>.SAV signature delimiter</td></tr>
+
+<tr><td>+0x11</td> <td>0xC000</td> <td>0x??, ...</td>
+    <td>RAM</td></tr>
+
+<tr><td>+0xC011</td> <td>0x4000</td> <td>0x??, ...</td>
+    <td>ROM</td></tr>
+
+<tr><td>+0x10011</td> <td>0x4000</td> <td>0x??, ...</td>
+    <td>VRAM</td></tr>
+
+<tr><td>+0x14011</td> <td>0x100</td> <td>0x??, ...</td> <td>Ports</td></tr>
+
+<tr><td>+0x14111</td> <td>1</td> <td>0x??</td> <td>B</td></tr>
+<tr><td>+0x14112</td> <td>1</td> <td>0x??</td> <td>C</td></tr>
+<tr><td>+0x14113</td> <td>1</td> <td>0x??</td> <td>D</td></tr>
+<tr><td>+0x14114</td> <td>1</td> <td>0x??</td> <td>E</td></tr>
+<tr><td>+0x14115</td> <td>1</td> <td>0x??</td> <td>H</td></tr>
+<tr><td>+0x14116</td> <td>1</td> <td>0x??</td> <td>L</td></tr>
+<tr><td>+0x14117</td> <td>1</td> <td>0x??</td> <td>A</td></tr>
+<tr><td>+0x14118</td> <td>1</td> <td>0x??</td> <td>F</td></tr>
+<tr><td>+0x14119</td> <td>2</td> <td>0x????</td> <td>SP</td></tr>
+<tr><td>+0x1411B</td> <td>2</td> <td>0x????</td> <td>PC</td></tr>
 
 </table>
-
 <br>
 <br>
 
@@ -119,7 +144,7 @@
 
 <table>
 
-<tr><td>Смещение</td><td>Размер</td><td>Значение</td><td>Описание</td></tr>
+<tr><th>Смещение</th><th>Размер</th><th>Значение</th><th>Описание</th></tr>
 
 <tr><td colspan="4">BASIC .LVT/.LVR</td></tr>
 <tr><td>+0x00</td><td>9</td><td>"LVOV/2.0/"</td>
@@ -206,9 +231,35 @@
 
 <tr><td colspan="4">DUMP .SAV</td></tr>
 <tr><td colspan="4">Формат дампов старой версии эмулятора.
-    <br>Не поддерживается, во многом в свое время он предназначался
+    <br>Во многом в свое время он предназначался
     для отладки, не рекомендую его использовать для распространения ПО
     </td></tr>
+<tr><td>+0x00</td><td>16</td><td>"LVOV/DUMP/2.0/H+"</td>
+    <td>Сигнатура .SAV-дампа</td></tr>
+<tr><td>+0x10</td><td>1</td><td>0x00</td>
+    <td>Ограничитель .SAV сигнатуры</td></tr>
+
+<tr><td>+0x11</td> <td>0xC000</td> <td>0x??, ...</td>
+    <td>RAM</td></tr>
+
+<tr><td>+0xC011</td> <td>0x4000</td> <td>0x??, ...</td>
+    <td>ROM</td></tr>
+
+<tr><td>+0x10011</td> <td>0x4000</td> <td>0x??, ...</td>
+    <td>VRAM</td></tr>
+
+<tr><td>+0x14011</td> <td>0x100</td> <td>0x??, ...</td> <td>Ports</td></tr>
+
+<tr><td>+0x14111</td> <td>1</td> <td>0x??</td> <td>B</td></tr>
+<tr><td>+0x14112</td> <td>1</td> <td>0x??</td> <td>C</td></tr>
+<tr><td>+0x14113</td> <td>1</td> <td>0x??</td> <td>D</td></tr>
+<tr><td>+0x14114</td> <td>1</td> <td>0x??</td> <td>E</td></tr>
+<tr><td>+0x14115</td> <td>1</td> <td>0x??</td> <td>H</td></tr>
+<tr><td>+0x14116</td> <td>1</td> <td>0x??</td> <td>L</td></tr>
+<tr><td>+0x14117</td> <td>1</td> <td>0x??</td> <td>A</td></tr>
+<tr><td>+0x14118</td> <td>1</td> <td>0x??</td> <td>F</td></tr>
+<tr><td>+0x14119</td> <td>2</td> <td>0x????</td> <td>SP</td></tr>
+<tr><td>+0x1411B</td> <td>2</td> <td>0x????</td> <td>PC</td></tr>
 
 </table>
 </body>
