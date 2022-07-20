@@ -26,10 +26,10 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 	 * 
 	 */
 	private static final long serialVersionUID = -7645934054444666050L;
-	private Debugger peer;
-	private JTextArea tty;
-	private JButton ok;
-	private JTextField cmdLine;
+	private final Debugger peer;
+	private final JTextArea tty;
+	private final JButton ok;
+	private final JTextField cmdLine;
 
 	// -----------------------------------------------------------------------------
 	DebuggerWindow(JFrame wnd, String title, boolean modal, Debugger peer) {
@@ -204,31 +204,31 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 	void render() {
 		int ln, ptr, pc = peer.PC(), sp = peer.SP();
 		tty.setText("Clock: " + peer.CLK() + "   " + (peer.HALTED() ? "HALTED: " + peer.REASON() : ""));
-		StringBuffer ttyCurrent = new StringBuffer(4096);
+		StringBuilder ttyCurrent = new StringBuilder(4096);
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		if (f_Reg) {
 			ttyCurrent.append("\n---[:Registers:]---");
-			ttyCurrent.append("\nB=" + hex2(peer.B()));
-			ttyCurrent.append("  C=" + hex2(peer.C()));
-			ttyCurrent.append("  D=" + hex2(peer.D()));
-			ttyCurrent.append("  E=" + hex2(peer.E()));
-			ttyCurrent.append("  H=" + hex2(peer.H()));
-			ttyCurrent.append("  L=" + hex2(peer.L()));
-			ttyCurrent.append("\nA=" + hex2(peer.A()));
-			ttyCurrent.append(" PC=" + hex4(peer.PC()));
-			ttyCurrent.append(" SP=" + hex4(peer.SP()));
+			ttyCurrent.append("\nB=").append(hex2(peer.B()));
+			ttyCurrent.append("  C=").append(hex2(peer.C()));
+			ttyCurrent.append("  D=").append(hex2(peer.D()));
+			ttyCurrent.append("  E=").append(hex2(peer.E()));
+			ttyCurrent.append("  H=").append(hex2(peer.H()));
+			ttyCurrent.append("  L=").append(hex2(peer.L()));
+			ttyCurrent.append("\nA=").append(hex2(peer.A()));
+			ttyCurrent.append(" PC=").append(hex4(peer.PC()));
+			ttyCurrent.append(" SP=").append(hex4(peer.SP()));
 			ttyCurrent.append("  F =");
 			for (int f = peer.F(), i = 128, j = 0; i > 0; i >>= 1, j++)
-				ttyCurrent.append(" " + flags[j][(f & i) == 0 ? 0 : 1]);
+				ttyCurrent.append(" ").append(flags[j][(f & i) == 0 ? 0 : 1]);
 		}
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		if (f_Mem) {
 			ttyCurrent.append("\n---[:Memory:]---");
 			for (ln = 0, ptr = ptr_Mem; ln < sz_Mem; ln++) {
-				ttyCurrent.append("\n" + hex4(ptr) + ":");
+				ttyCurrent.append("\n").append(hex4(ptr)).append(":");
 				for (int b = 0; b < 16; b++, ptr++)
-					ttyCurrent.append(((b == 4 || b == 8 || b == 12) ? " - " : " ") + hex2(peer.MEM(ptr)));
+					ttyCurrent.append((b == 4 || b == 8 || b == 12) ? " - " : " ").append(hex2(peer.MEM(ptr)));
 			}
 			new_Mem = ptr;
 		}
@@ -236,9 +236,9 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 		if (f_Port) {
 			ttyCurrent.append("\n---[:Ports:]---");
 			for (ln = 0, ptr = ptr_Port; ln < sz_Port; ln++) {
-				ttyCurrent.append("\n" + hex4(ptr) + ":");
+				ttyCurrent.append("\n").append(hex4(ptr)).append(":");
 				for (int b = 0; b < 16; b++, ptr++)
-					ttyCurrent.append(((b == 4 || b == 8 || b == 12) ? " - " : " ") + hex2(peer.IO(ptr)));
+					ttyCurrent.append((b == 4 || b == 8 || b == 12) ? " - " : " ").append(hex2(peer.IO(ptr)));
 			}
 			new_Port = ptr;
 		}
@@ -247,7 +247,7 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 			ttyCurrent.append("\n---[:Code: & :Stack:]---");
 			int stack = sp + sz_Code * 2 - 2;
 			for (ln = 0, ptr = ptr_Code; ln < sz_Code; ln++, ptr++, stack -= 2) {
-				ttyCurrent.append("\n" + hex4(ptr) + ": " + (ptr == pc ? ">>>" : "   ") + " ");
+				ttyCurrent.append("\n").append(hex4(ptr)).append(": ").append(ptr == pc ? ">>>" : "   ").append(" ");
 				String cmd = opcodes[peer.MEM(ptr)];
 				int pos = ttyCurrent.length();
 				for (int i = 0; i < cmd.length(); i++) {
@@ -272,7 +272,7 @@ class DebuggerWindow extends JDialog implements ActionListener, WindowListener, 
 				}
 				while (ttyCurrent.length() - pos < 16)
 					ttyCurrent.append(' ');
-				ttyCurrent.append("" + hex4(stack) + ": " + hex4(peer.MEM2(stack)));
+				ttyCurrent.append(hex4(stack)).append(": ").append(hex4(peer.MEM2(stack)));
 			}
 			new_Code = ptr;
 		}

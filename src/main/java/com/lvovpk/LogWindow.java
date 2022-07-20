@@ -24,9 +24,9 @@ public class LogWindow extends JDialog implements ActionListener, WindowListener
 	 * 
 	 */
 	private static final long serialVersionUID = -5844867748591714511L;
-	private JTextArea logText;
-	private JButton clearButton;
-	private JButton closeButton;
+	private final JTextArea logText;
+	private final JButton clearButton;
+	private final JButton closeButton;
 
 	public LogWindow(JFrame owner, String title, boolean modal) {
 		super(owner, title, modal);

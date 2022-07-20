@@ -20,12 +20,10 @@ import javax.swing.ScrollPaneConstants;
  * Simple Text Editor
  */
 class EditorWindow extends JDialog implements ActionListener, WindowListener {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 2839796731433686240L;
 	public JTextArea txt;
-	private JButton ok, cancel, checkIn, checkOut;
+	private final JButton ok, cancel, checkIn, checkOut;
 	private int cmdIn, cmdOut;
 	private Gui peer;
 

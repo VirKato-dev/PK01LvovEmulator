@@ -11,8 +11,8 @@ import javax.swing.KeyStroke;
  * Tool GUI Package
  */
 public class GuiUtils implements ActionListener {
-	private int command;
-	private Gui peer;
+	private final int command;
+	private final Gui peer;
 
 	private GuiUtils(Gui recv, int cmd) {
 		peer = recv;

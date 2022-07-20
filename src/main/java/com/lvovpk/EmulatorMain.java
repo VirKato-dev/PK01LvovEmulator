@@ -13,9 +13,7 @@ import javax.swing.UIManager;
  * Entry Point to Lvov Emulator
  */
 public class EmulatorMain extends EmulatorUI {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 4339279222189621874L;
 	private String[] args;
 
@@ -31,7 +29,7 @@ public class EmulatorMain extends EmulatorUI {
 
 	// -----------------------------------------------------------------------------
 	private static void parse(String output, int codepage) throws IOException {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		InputStreamReader in = new InputStreamReader(System.in);
 		for (int ch; (ch = in.read()) >= 0; sb.append((char) ch));
 		in.close();

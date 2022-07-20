@@ -10,9 +10,7 @@ import java.io.OutputStream;
  * LVOV Software Abstraction Toolkit
  */
 class PK01 extends PK00 {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -8094497537939504694L;
 
 	// Bios def

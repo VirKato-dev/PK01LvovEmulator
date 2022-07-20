@@ -22,7 +22,7 @@ class PKIO {
 	// -----------------------------------------------------------------------------
 	final static String NL = System.getProperty("line.separator", "\r\n");
 
-	private static String[][] codes = {
+	private static final String[][] codes = {
 		
 		// Unicode //
 		{"\u045b\u0402\u0403\u2013\u201e\u2026\u201d\u0453"+ //  866 upcase
@@ -83,7 +83,7 @@ class PKIO {
 
 	// -----------------------------------------------------------------------------
 	static char koi2dos(char koi, int codepage) {
-		return (char) ((koi >= 0x60 && koi <= 0x7F) ? codes[codepage][0].charAt(koi - 0x60) : koi);
+		return (koi >= 0x60 && koi <= 0x7F) ? codes[codepage][0].charAt(koi - 0x60) : koi;
 	}
 
 	// -----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ class PKIO {
 
 	// -----------------------------------------------------------------------------
 	static String koi2dos(String koi, int codepage) {
-		StringBuffer dos = new StringBuffer(koi);
+		StringBuilder dos = new StringBuilder(koi);
 		for (int i = 0; i < dos.length(); i++)
 			dos.setCharAt(i, koi2dos(dos.charAt(i), codepage));
 		return dos.toString();
@@ -111,7 +111,7 @@ class PKIO {
 
 	// -----------------------------------------------------------------------------
 	static String dos2koi(String dos, int codepage) {
-		StringBuffer koi = new StringBuffer(dos);
+		StringBuilder koi = new StringBuilder(dos);
 		for (int i = 0; i < koi.length(); i++)
 			koi.setCharAt(i, dos2koi(koi.charAt(i), codepage));
 		return koi.toString();
@@ -120,7 +120,7 @@ class PKIO {
 	// -----------------------------------------------------------------------------
 	// T a p e s H a n d l i n g
 	// -----------------------------------------------------------------------------
-	private static String[] toks = {
+	private static final String[] toks = {
 		// 0x80
 		"END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ", "LET",
 		"GOTO", "RUN", "IF", "RESTORE", "GOSUB", "RETURN", "REM", "STOP",
@@ -183,7 +183,7 @@ class PKIO {
 			throw new IOException("Not a Basic program");
 
 		int ch, line;
-		StringBuffer text = new StringBuffer();
+		StringBuilder text = new StringBuilder();
 
 		while (Utils.restoreWord(prog) != 0) {
 			line = Utils.restoreWord(prog);

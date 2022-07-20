@@ -40,9 +40,6 @@ import javax.swing.MenuElement;
  */
 public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, KeyListener, WindowListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 46689693694740808L;
 	static final String EMULATOR_VERSION = "1.4";
 	static final int CM_CONFIG = 19;
@@ -85,14 +82,12 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 
 			o.println("#OSD Settings");
 			k = Utils.sort(config.keySet(), true);
-			for (int i = 0; i < k.length; i++)
-				o.println(Utils.padRight(k[i], 40) + config.get(k[i]));
+			for (String s : k) o.println(Utils.padRight(s, 40) + config.get(s));
 			o.println("");
 
 			o.println("#LVOV Settings");
 			k = Utils.sort(Defaults.cfg.keySet(), true);
-			for (int i = 0; i < k.length; i++)
-				o.println(Utils.padRight(k[i], 40) + Defaults.cfg.get(k[i]));
+			for (String s : k) o.println(Utils.padRight(s, 40) + Defaults.cfg.get(s));
 			o.println("");
 
 			o.close();
@@ -145,7 +140,7 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 	}
 
 	// -----------------------------------------------------------------------------
-	private static Map<String, String> config;
+	private static final Map<String, String> config;
 	static {
 		config = new ConcurrentHashMap<String, String>();
 
@@ -187,8 +182,8 @@ public class EmulatorUI extends ExtendedEmulator implements Gui, MouseListener, 
 		config.put("Enable_FlatContextMenu", "Yes");
 		for (int i = 0; i < menus.length; i++) {
 			config.put("Enable_" + menus[i][0], menus[i][1]);
-			for (int j = 0; j < features.length; j++)
-				config.put("Enable_" + menus[i][0] + "_" + features[j][0] + "_Feature", features[j][i + 1]);
+			for (String[] feature : features)
+				config.put("Enable_" + menus[i][0] + "_" + feature[0] + "_Feature", feature[i + 1]);
 		}
 	}
 

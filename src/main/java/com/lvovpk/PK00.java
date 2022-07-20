@@ -17,16 +17,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 abstract class PK00 extends Canvas implements KeyListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5674032851714416043L;
 	final static int MODE_FIRST = 1;
 	final static int MODE_LAST = 11;
 
 	private int scaleX = 1;
 	private int scaleY = 1;
-	private int[][] scaleFactors = { {1, 1}, {2, 2}, {3, 2}, {5, 3}, {6, 4}, {7, 4} };
+	private final int[][] scaleFactors = { {1, 1}, {2, 2}, {3, 2}, {5, 3}, {6, 4}, {7, 4} };
 	
 	Lvov pk;
 
@@ -68,7 +65,7 @@ abstract class PK00 extends Canvas implements KeyListener {
 	// K e y b o a r d M a n i p u l a t i o n s
 	// a n d S u p p l e m e n t a r y S t u f f
 	// -----------------------------------------------------------------------------
-	private Map<Integer, Integer> keyMask = new ConcurrentHashMap<Integer, Integer>();
+	private final Map<Integer, Integer> keyMask = new ConcurrentHashMap<Integer, Integer>();
 
 	// -----------------------------------------------------------------------------
 	public void clrKb(int vk) {
@@ -141,8 +138,8 @@ abstract class PK00 extends Canvas implements KeyListener {
 	private boolean renderInterlaced;
 	private Image vImg;
 	private MemoryImageSource vSrc;
-	private byte[] vMem = new byte[256 * 7 * 256 * 4]; // up to 1792x1024
-	private byte[][] vPal = new byte[256][4];
+	private final byte[] vMem = new byte[256 * 7 * 256 * 4]; // up to 1792x1024
+	private final byte[][] vPal = new byte[256][4];
 
 	// -----------------------------------------------------------------------------
 	private void makeVPal() {

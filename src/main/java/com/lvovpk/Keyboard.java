@@ -236,9 +236,9 @@ class Keyboard {
 
 	public static int getCommandForShortcut(KeyEvent e) {
 		if (enableShortcuts) {
-			for (int i = 0; i < SHORTCUTS.length; i++) {
-				if (SHORTCUTS[i][0] == e.getKeyCode() && (SHORTCUTS[i][1] * shortcutsModifiers) == (e.getModifiersEx() & MODIFIERS_MASK)) {
-					return SHORTCUTS[i][2];
+			for (int[] shortcut : SHORTCUTS) {
+				if (shortcut[0] == e.getKeyCode() && (shortcut[1] * shortcutsModifiers) == (e.getModifiersEx() & MODIFIERS_MASK)) {
+					return shortcut[2];
 				}
 			}
 		}
@@ -247,9 +247,9 @@ class Keyboard {
 
 	public static int[] getShortcutForCommand(int command) {
 		if (enableShortcuts) {
-			for (int i = 0; i < SHORTCUTS.length; i++) {
-				if (SHORTCUTS[i][2] == command) {
-					return new int[] { SHORTCUTS[i][0], SHORTCUTS[i][1] * shortcutsModifiers };
+			for (int[] shortcut : SHORTCUTS) {
+				if (shortcut[2] == command) {
+					return new int[]{shortcut[0], shortcut[1] * shortcutsModifiers};
 				}
 			}
 		}

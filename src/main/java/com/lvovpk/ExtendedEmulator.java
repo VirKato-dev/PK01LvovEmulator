@@ -19,9 +19,6 @@ import javax.imageio.ImageIO;
  */
 public abstract class ExtendedEmulator extends PrimitiveEmulator {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -4020586722385270698L;
 	static final int CM_MODE = 1;
 	static final int CM_RESET = 2;
